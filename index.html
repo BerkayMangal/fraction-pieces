@@ -9,63 +9,45 @@
 
 <body>
 
-<!-- START SCREEN -->
 <div id="startScreen" class="screen active">
-  <h1>Fraction Pieces 🍕</h1>
-  <p class="subtitle">Make the pizza that matches the order!</p>
-  <button class="bigBtn" onclick="showHow()">How to Play</button>
-  <button class="bigBtn primary" onclick="startGame()">Play</button>
+
+<img src="assets/logo.png" class="logo">
+
+<button class="playButton" onclick="startGame()">PLAY</button>
+
 </div>
 
-<!-- HOW TO PLAY -->
-<div id="howScreen" class="screen">
-  <h2>How to Play</h2>
-  <p>1) Tap a topping.</p>
-  <p>2) Tap pizza slices to fill them.</p>
-  <p>3) Match the order pizza.</p>
-  <button class="bigBtn" onclick="backToStart()">Back</button>
-</div>
-
-<!-- GAME -->
 <div id="gameScreen" class="screen">
 
-  <h1>Fraction Pieces 🍕</h1>
+<div class="topBar">
 
-  <div id="characters">
-    <div class="character">
-      👨‍🍳 Chef Mozza
-      <div id="chefSpeech" class="speech">Let's make a pizza!</div>
-    </div>
+<img src="assets/chef-mozza.png" class="chef">
 
-    <div class="character">
-      🍕 Slice
-      <div id="sliceSpeech" class="speech">Copy the order!</div>
-    </div>
-  </div>
+<div id="speech">Make the pizza!</div>
 
-  <div id="order">
-    <h3>Customer Order</h3>
-    <div id="orderPreview" class="miniPizza"></div>
-  </div>
-
-  <div id="pizza"></div>
-
-  <div id="toppings">
-    <button onclick="selectTopping('cheese')" class="cheeseBtn">🧀 Cheese</button>
-    <button onclick="selectTopping('olive')" class="oliveBtn">🫒 Olive</button>
-    <button onclick="selectTopping('pepperoni')" class="pepperoniBtn">🍕 Pepperoni</button>
-  </div>
-
-  <button id="serveButton" onclick="servePizza()">Serve Pizza</button>
-
-  <div id="stars"></div>
-  <div id="message"></div>
+<img src="assets/slice.png" class="sliceChar">
 
 </div>
 
-<audio id="soundPop" src="https://cdn.jsdelivr.net/gh/jshawl/AudioFX/pop.mp3"></audio>
-<audio id="soundSuccess" src="https://cdn.jsdelivr.net/gh/jshawl/AudioFX/success.mp3"></audio>
-<audio id="soundFail" src="https://cdn.jsdelivr.net/gh/jshawl/AudioFX/error.mp3"></audio>
+<div id="orderPreview" class="miniPizza"></div>
+
+<div id="pizza"></div>
+
+<div id="toppings">
+
+<img src="assets/cheese.png" onclick="selectTopping('cheese')" class="topping">
+
+<img src="assets/olive.png" onclick="selectTopping('olive')" class="topping">
+
+<img src="assets/pepperoni.png" onclick="selectTopping('pepperoni')" class="topping">
+
+</div>
+
+<button id="serveButton" onclick="servePizza()">Serve Pizza</button>
+
+<div id="stars"></div>
+
+</div>
 
 <script src="levels.js"></script>
 <script src="game.js"></script>
