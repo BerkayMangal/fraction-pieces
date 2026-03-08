@@ -14,6 +14,8 @@ const levels = [
 
 { order:["cheese","olive","pepperoni","cheese"] },
 
-{ order:["pepperoni","olive","cheese","olive"] }
+{ order:["pepperoni","olive","cheese","olive"] },
+
+{ order:["cheese","pepperoni","olive","cheese"] }
 
 ]
