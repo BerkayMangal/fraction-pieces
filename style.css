@@ -1,25 +1,51 @@
 body{
-font-family: Arial;
+font-family:Arial;
 text-align:center;
 background:#ffe8b5;
+margin:0;
+}
+
+h1{
+background:#ffb347;
+padding:15px;
+margin:0;
+}
+
+#characters{
+display:flex;
+justify-content:center;
+gap:40px;
+margin-top:10px;
+}
+
+.character{
+font-size:18px;
+}
+
+.speech{
+background:white;
+border-radius:10px;
+padding:5px 10px;
+margin-top:5px;
+font-size:14px;
 }
 
 #pizza{
 display:grid;
 grid-template-columns:1fr 1fr;
 grid-template-rows:1fr 1fr;
-width:300px;
-height:300px;
+width:320px;
+height:320px;
 margin:20px auto;
+border-radius:50%;
+overflow:hidden;
 }
 
 .slice{
-border:3px solid #333;
-background:yellow;
+border:2px solid #333;
 display:flex;
 align-items:center;
 justify-content:center;
-font-weight:bold;
 cursor:pointer;
 transition:transform 0.2s;
 }
@@ -28,38 +54,57 @@ transition:transform 0.2s;
 transform:scale(1.05);
 }
 
+.cheese{
+background:#ffd84d;
+}
+
+.olive{
+background:#222;
+}
+
+.pepperoni{
+background:#e63946;
+}
+
+#toppings{
+margin-top:10px;
+}
+
 button{
-padding:10px;
-margin:5px;
+padding:10px 16px;
+margin:6px;
 font-size:16px;
+border:none;
+border-radius:10px;
 cursor:pointer;
+}
+
+.cheeseBtn{
+background:#ffd84d;
+}
+
+.oliveBtn{
+background:#333;
+color:white;
+}
+
+.pepperoniBtn{
+background:#e63946;
+color:white;
+}
+
+#serveButton{
+background:#4CAF50;
+color:white;
+margin-top:10px;
 }
 
 #message{
 font-size:24px;
-margin-top:20px;
-}
-.cheese {
-background:#ffd84d;
+margin-top:15px;
 }
 
-.olive {
-background:#2b2b2b;
-color:white;
-}
-
-.pepperoni {
-background:#e63946;
-color:white;
-}
-.cheese {
-  background: #ffd84d;
-}
-
-.olive {
-  background: #2b2b2b;
-}
-
-.pepperoni {
-  background: #e63946;
+#stars{
+font-size:30px;
+margin-top:10px;
 }
