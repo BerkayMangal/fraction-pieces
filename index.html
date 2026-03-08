@@ -2,52 +2,64 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fraction Pieces</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>Fraction Pieces 🍕</h1>
-
-<div id="characters">
-
-<div class="character">
-👨‍🍳 Chef Mozza  
-<div class="speech">Let's make a pizza!</div>
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <h1>Fraction Pieces 🍕</h1>
+  <p class="subtitle">Make the pizza that matches the order!</p>
+  <button class="bigBtn" onclick="showHow()">How to Play</button>
+  <button class="bigBtn primary" onclick="startGame()">Play</button>
 </div>
 
-<div class="character">
-🍕 Slice  
-<div class="speech">Follow the order!</div>
+<!-- HOW TO PLAY -->
+<div id="howScreen" class="screen">
+  <h2>How to Play</h2>
+  <p>1) Tap a topping.</p>
+  <p>2) Tap pizza slices to fill them.</p>
+  <p>3) Match the order pizza.</p>
+  <button class="bigBtn" onclick="backToStart()">Back</button>
 </div>
 
-</div>
+<!-- GAME -->
+<div id="gameScreen" class="screen">
 
-<div id="game">
+  <h1>Fraction Pieces 🍕</h1>
 
-<div id="order">
-<h2>Customer Order</h2>
-<div id="orderPreview"></div>
-</div>
+  <div id="characters">
+    <div class="character">
+      👨‍🍳 Chef Mozza
+      <div id="chefSpeech" class="speech">Let's make a pizza!</div>
+    </div>
 
-<div id="pizza"></div>
+    <div class="character">
+      🍕 Slice
+      <div id="sliceSpeech" class="speech">Copy the order!</div>
+    </div>
+  </div>
 
-<div id="toppings">
+  <div id="order">
+    <h3>Customer Order</h3>
+    <div id="orderPreview" class="miniPizza"></div>
+  </div>
 
-<button onclick="selectTopping('cheese')" class="cheeseBtn">🧀 Cheese</button>
+  <div id="pizza"></div>
 
-<button onclick="selectTopping('olive')" class="oliveBtn">🫒 Olive</button>
+  <div id="toppings">
+    <button onclick="selectTopping('cheese')" class="cheeseBtn">🧀 Cheese</button>
+    <button onclick="selectTopping('olive')" class="oliveBtn">🫒 Olive</button>
+    <button onclick="selectTopping('pepperoni')" class="pepperoniBtn">🍕 Pepperoni</button>
+  </div>
 
-<button onclick="selectTopping('pepperoni')" class="pepperoniBtn">🍕 Pepperoni</button>
+  <button id="serveButton" onclick="servePizza()">Serve Pizza</button>
 
-</div>
-
-<button id="serveButton" onclick="servePizza()">Serve Pizza</button>
-
-<div id="stars"></div>
-
-<div id="message"></div>
+  <div id="stars"></div>
+  <div id="message"></div>
 
 </div>
 
