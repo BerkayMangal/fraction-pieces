@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,45 +9,22 @@
 
 <body>
 
-<div id="startScreen" class="screen active">
-<h1>Fraction Pieces 🍕</h1>
-<button id="playBtn">Play</button>
-<button id="howBtn">How to Play</button>
-</div>
+<div id="startScreen">
 
-<div id="howScreen" class="screen">
-<h2>How to Play</h2>
-<p>Tap a topping.</p>
-<p>Tap pizza slices.</p>
-<p>Match the order pizza.</p>
-<button id="backBtn">Back</button>
-</div>
+<img src="assets/start-screen.png" class="startImage">
 
-<div id="gameScreen" class="screen">
-
-<h1>Fraction Pieces 🍕</h1>
-
-<div id="order">
-<h3>Customer Order</h3>
-<div id="orderPreview" class="miniPizza"></div>
-</div>
-
-<div id="pizza"></div>
-
-<div id="toppings">
-<button data-top="cheese">🧀</button>
-<button data-top="olive">🫒</button>
-<button data-top="pepperoni">🍕</button>
-</div>
-
-<button id="serveBtn">Serve Pizza</button>
-
-<div id="stars"></div>
-<div id="message"></div>
+<button id="playButton">PLAY</button>
 
 </div>
 
-<script src="levels.js"></script>
+<div id="gameScreen">
+
+<h1>Fraction Pieces</h1>
+
+<p>Game coming next step 🚀</p>
+
+</div>
+
 <script src="game.js"></script>
 
 </body>
