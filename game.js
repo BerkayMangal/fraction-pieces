@@ -15,7 +15,7 @@ for(let i=0;i<4;i++){
 let slice=document.createElement("div")
 slice.className="slice"
 slice.innerText="cheese"
-
+slice.classList.add("cheese")
 slice.onclick=function(){
 placeTopping(i)
 }
@@ -48,7 +48,8 @@ function placeTopping(i){
 pizza[i]=selectedTopping
 
 let slices=document.querySelectorAll(".slice")
-slices[i].innerText=selectedTopping
+slices[i].className="slice " + selectedTopping
+slices[i].innerText=""
 
 slices[i].style.transform="scale(1.2)"
 
