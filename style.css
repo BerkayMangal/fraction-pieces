@@ -5,17 +5,38 @@ background:#ffe8b5;
 margin:0;
 }
 
-h1{
-background:#ffb347;
-padding:15px;
-margin:0;
+.screen{
+display:none;
+padding:20px;
+}
+
+.screen.active{
+display:block;
+}
+
+.subtitle{
+margin-bottom:20px;
+}
+
+.bigBtn{
+padding:14px 24px;
+font-size:18px;
+margin:10px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+}
+
+.primary{
+background:#4CAF50;
+color:white;
 }
 
 #characters{
 display:flex;
 justify-content:center;
 gap:40px;
-margin-top:10px;
+margin-bottom:10px;
 }
 
 .character{
@@ -25,7 +46,7 @@ font-size:18px;
 .speech{
 background:white;
 border-radius:10px;
-padding:5px 10px;
+padding:6px 10px;
 margin-top:5px;
 font-size:14px;
 }
@@ -43,9 +64,6 @@ overflow:hidden;
 
 .slice{
 border:2px solid #333;
-display:flex;
-align-items:center;
-justify-content:center;
 cursor:pointer;
 transition:transform 0.2s;
 }
@@ -54,21 +72,9 @@ transition:transform 0.2s;
 transform:scale(1.05);
 }
 
-.cheese{
-background:#ffd84d;
-}
-
-.olive{
-background:#222;
-}
-
-.pepperoni{
-background:#e63946;
-}
-
-#toppings{
-margin-top:10px;
-}
+.cheese{background:#ffd84d;}
+.olive{background:#222;}
+.pepperoni{background:#e63946;}
 
 button{
 padding:10px 16px;
@@ -79,19 +85,9 @@ border-radius:10px;
 cursor:pointer;
 }
 
-.cheeseBtn{
-background:#ffd84d;
-}
-
-.oliveBtn{
-background:#333;
-color:white;
-}
-
-.pepperoniBtn{
-background:#e63946;
-color:white;
-}
+.cheeseBtn{background:#ffd84d;}
+.oliveBtn{background:#333;color:white;}
+.pepperoniBtn{background:#e63946;color:white;}
 
 #serveButton{
 background:#4CAF50;
@@ -99,12 +95,39 @@ color:white;
 margin-top:10px;
 }
 
-#message{
-font-size:24px;
-margin-top:15px;
-}
-
 #stars{
 font-size:30px;
 margin-top:10px;
+}
+
+#message{
+font-size:22px;
+margin-top:10px;
+}
+
+/* MINI ORDER PIZZA */
+.miniPizza{
+display:grid;
+grid-template-columns:1fr 1fr;
+grid-template-rows:1fr 1fr;
+width:120px;
+height:120px;
+margin:10px auto;
+border-radius:50%;
+overflow:hidden;
+border:2px solid #333;
+}
+
+.miniSlice{
+border:1px solid #333;
+}
+
+.sparkle{
+animation:sparkle 0.4s ease;
+}
+
+@keyframes sparkle{
+0%{transform:scale(1);}
+50%{transform:scale(1.2);}
+100%{transform:scale(1);}
 }
