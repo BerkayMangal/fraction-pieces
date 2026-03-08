@@ -1,75 +1,123 @@
-let currentLevel = 0;
-let selectedTopping = "cheese";
+let currentLevel = 0
+let selectedTopping = "cheese"
+let pizza = ["cheese","cheese","cheese","cheese"]
 
-let pizza = ["cheese", "cheese", "cheese", "cheese"];
+function startLevel(){
 
-function startLevel() {
-  let pizzaDiv = document.getElementById("pizza");
-  pizzaDiv.innerHTML = "";
+let pizzaDiv=document.getElementById("pizza")
+pizzaDiv.innerHTML=""
 
-  pizza = ["cheese", "cheese", "cheese", "cheese"];
+pizza=["cheese","cheese","cheese","cheese"]
 
-  for (let i = 0; i < 4; i++) {
-    let slice = document.createElement("div");
-    slice.className = "slice cheese";
-    slice.innerText = "";
+for(let i=0;i<4;i++){
 
-    slice.onclick = function () {
-      placeTopping(i);
-    };
+let slice=document.createElement("div")
 
-    pizzaDiv.appendChild(slice);
-  }
+slice.className="slice cheese"
 
-  showOrder();
-  document.getElementById("message").innerText = "";
+slice.onclick=function(){
+placeTopping(i)
 }
 
-function showOrder() {
-  let order = levels[currentLevel].order;
-  let preview = document.getElementById("orderPreview");
-  preview.innerText = order.join(" | ");
+pizzaDiv.appendChild(slice)
+
 }
 
-function selectTopping(t) {
-  selectedTopping = t;
+showOrder()
+
+document.getElementById("message").innerText=""
+document.getElementById("stars").innerText=""
+
 }
 
-function placeTopping(i) {
-  pizza[i] = selectedTopping;
+function showOrder(){
 
-  let slices = document.querySelectorAll(".slice");
-  slices[i].className = "slice " + selectedTopping;
-  slices[i].style.transform = "scale(1.12)";
+let order=levels[currentLevel].order
 
-  setTimeout(() => {
-    slices[i].style.transform = "scale(1)";
-  }, 150);
+let preview=document.getElementById("orderPreview")
+
+preview.innerHTML=""
+
+order.forEach(t=>{
+let s=document.createElement("span")
+s.innerText=t+" "
+preview.appendChild(s)
+})
+
 }
 
-function servePizza() {
-  let correct = levels[currentLevel].order;
-  let ok = true;
+function selectTopping(t){
 
-  for (let i = 0; i < 4; i++) {
-    if (pizza[i] !== correct[i]) {
-      ok = false;
-    }
-  }
+selectedTopping=t
 
-  if (ok) {
-    document.getElementById("message").innerText = "⭐ Great Pizza!";
-    currentLevel++;
+document.getElementById("soundPop").play()
 
-    if (currentLevel >= levels.length) {
-      document.getElementById("message").innerText = "🏆 You finished the game!";
-    } else {
-      setTimeout(startLevel, 1000);
-    }
-  } else {
-    document.getElementById("message").innerText = "❌ Try Again";
-    setTimeout(startLevel, 1000);
-  }
 }
 
-startLevel();
+function placeTopping(i){
+
+pizza[i]=selectedTopping
+
+let slices=document.querySelectorAll(".slice")
+
+slices[i].className="slice "+selectedTopping
+
+slices[i].style.transform="scale(1.2)"
+
+setTimeout(()=>{
+slices[i].style.transform="scale(1)"
+},150)
+
+}
+
+function servePizza(){
+
+let correct=levels[currentLevel].order
+
+let correctCount=0
+
+for(let i=0;i<4;i++){
+
+if(pizza[i]===correct[i]) correctCount++
+
+}
+
+if(correctCount===4){
+
+document.getElementById("message").innerText="Perfect Pizza!"
+
+document.getElementById("soundSuccess").play()
+
+document.getElementById("stars").innerText="⭐⭐⭐"
+
+currentLevel++
+
+if(currentLevel>=levels.length){
+
+document.getElementById("message").innerText="You finished the game!"
+
+}
+
+else{
+
+setTimeout(startLevel,1500)
+
+}
+
+}
+
+else{
+
+document.getElementById("message").innerText="Try Again"
+
+document.getElementById("soundFail").play()
+
+document.getElementById("stars").innerText="⭐"
+
+setTimeout(startLevel,1500)
+
+}
+
+}
+
+startLevel()
