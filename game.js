@@ -1,132 +1,143 @@
-let currentLevel = 0
-let selectedTopping = "cheese"
-let pizza = ["cheese","cheese","cheese","cheese"]
+let currentLevel = 0;
+let selectedTopping = "cheese";
+let pizza = ["cheese", "cheese", "cheese", "cheese"];
 
-function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"))
-  document.getElementById(id).classList.add("active")
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach((screen) => {
+    screen.classList.remove("active");
+  });
+  document.getElementById(id).classList.add("active");
 }
 
-function startGame(){
-  showScreen("gameScreen")
-  currentLevel = 0
-  startLevel()
+function showHow() {
+  showScreen("howScreen");
 }
 
-function showHow(){
-  showScreen("howScreen")
+function backToStart() {
+  showScreen("startScreen");
 }
 
-function backToStart(){
-  showScreen("startScreen")
+function startGame() {
+  currentLevel = 0;
+  showScreen("gameScreen");
+  startLevel();
 }
 
-function toppingEmoji(t){
-  if(t === "cheese") return "🧀"
-  if(t === "olive") return "🫒"
-  if(t === "pepperoni") return "🍕"
-  return ""
+function toppingEmoji(topping) {
+  if (topping === "cheese") return "🧀";
+  if (topping === "olive") return "🫒";
+  if (topping === "pepperoni") return "🍕";
+  return "";
 }
 
-function startLevel(){
-  let pizzaDiv = document.getElementById("pizza")
-  pizzaDiv.innerHTML = ""
+function safePlay(audioId) {
+  const el = document.getElementById(audioId);
+  if (!el) return;
+  el.currentTime = 0;
+  el.play().catch(() => {});
+}
 
-  pizza = ["cheese","cheese","cheese","cheese"]
+function startLevel() {
+  const pizzaDiv = document.getElementById("pizza");
+  pizzaDiv.innerHTML = "";
 
-  for(let i = 0; i < 4; i++){
-    let slice = document.createElement("div")
-    slice.className = "slice cheese"
-    slice.innerHTML = `<div class="sliceImg">${toppingEmoji("cheese")}</div>`
+  pizza = ["cheese", "cheese", "cheese", "cheese"];
 
-    slice.onclick = function(){
-      placeTopping(i)
-    }
-
-    pizzaDiv.appendChild(slice)
+  for (let i = 0; i < 4; i++) {
+    const slice = document.createElement("div");
+    slice.className = "slice cheese";
+    slice.innerHTML = `<div class="sliceIcon">${toppingEmoji("cheese")}</div>`;
+    slice.onclick = function () {
+      placeTopping(i);
+    };
+    pizzaDiv.appendChild(slice);
   }
 
-  showOrder()
-
-  document.getElementById("message").innerText = ""
-  document.getElementById("stars").innerText = ""
+  showOrder();
+  document.getElementById("message").innerText = "";
+  document.getElementById("stars").innerText = "";
+  document.getElementById("chefSpeech").innerText = "Let's make a pizza!";
+  document.getElementById("sliceSpeech").innerText = "Copy the order!";
 }
 
-function showOrder(){
-  let order = levels[currentLevel].order
-  let preview = document.getElementById("orderPreview")
-  preview.innerHTML = ""
+function showOrder() {
+  const order = levels[currentLevel].order;
+  const preview = document.getElementById("orderPreview");
+  preview.innerHTML = "";
 
-  order.forEach(t => {
-    let s = document.createElement("div")
-    s.className = "miniSlice " + t
-    preview.appendChild(s)
-  })
+  order.forEach((topping) => {
+    const piece = document.createElement("div");
+    piece.className = "miniSlice " + topping;
+    preview.appendChild(piece);
+  });
 }
 
-function selectTopping(t){
-  selectedTopping = t
-
-  const pop = document.getElementById("soundPop")
-  if(pop){
-    pop.currentTime = 0
-    pop.play().catch(() => {})
-  }
+function selectTopping(topping) {
+  selectedTopping = topping;
+  safePlay("soundPop");
+  document.getElementById("sliceSpeech").innerText = "Great choice!";
 }
 
-function placeTopping(i){
-  pizza[i] = selectedTopping
+function placeTopping(index) {
+  pizza[index] = selectedTopping;
 
-  let slices = document.querySelectorAll(".slice")
-  slices[i].className = "slice " + selectedTopping
-  slices[i].innerHTML = `<div class="sliceImg">${toppingEmoji(selectedTopping)}</div>`
-
-  slices[i].classList.add("sparkle")
+  const slices = document.querySelectorAll(".slice");
+  slices[index].className = "slice " + selectedTopping;
+  slices[index].innerHTML = `<div class="sliceIcon">${toppingEmoji(selectedTopping)}</div>`;
+  slices[index].classList.add("sparkle");
 
   setTimeout(() => {
-    slices[i].classList.remove("sparkle")
-  }, 300)
+    slices[index].classList.remove("sparkle");
+  }, 300);
 }
 
-function servePizza(){
-  let correct = levels[currentLevel].order
-  let correctCount = 0
+function servePizza() {
+  const correct = levels[currentLevel].order;
+  let correctCount = 0;
 
-  for(let i = 0; i < 4; i++){
-    if(pizza[i] === correct[i]) correctCount++
+  for (let i = 0; i < 4; i++) {
+    if (pizza[i] === correct[i]) {
+      correctCount++;
+    }
   }
 
-  let stars = "⭐"
-  if(correctCount === 4) stars = "⭐⭐⭐"
-  else if(correctCount === 3) stars = "⭐⭐"
+  let stars = "⭐";
+  if (correctCount === 4) stars = "⭐⭐⭐";
+  else if (correctCount === 3) stars = "⭐⭐";
 
-  document.getElementById("stars").innerText = stars
+  document.getElementById("stars").innerText = stars;
 
-  if(correctCount === 4){
-    document.getElementById("message").innerText = "Perfect Pizza!"
+  if (correctCount === 4) {
+    document.getElementById("message").innerText = "Perfect Pizza!";
+    document.getElementById("chefSpeech").innerText = "Amazing work!";
+    document.getElementById("sliceSpeech").innerText = "Yum! Next one!";
+    safePlay("soundSuccess");
 
-    const success = document.getElementById("soundSuccess")
-    if(success){
-      success.currentTime = 0
-      success.play().catch(() => {})
-    }
+    currentLevel++;
 
-    currentLevel++
-
-    if(currentLevel >= levels.length){
-      document.getElementById("message").innerText = "You finished the game!"
+    if (currentLevel >= levels.length) {
+      document.getElementById("message").innerText = "You finished the game!";
+      document.getElementById("chefSpeech").innerText = "You are a pizza star!";
+      document.getElementById("sliceSpeech").innerText = "We did it!";
     } else {
-      setTimeout(startLevel, 1200)
+      setTimeout(() => {
+        startLevel();
+      }, 1200);
     }
   } else {
-    document.getElementById("message").innerText = "Try Again"
+    document.getElementById("message").innerText = "Try Again";
+    document.getElementById("chefSpeech").innerText = "Almost!";
+    document.getElementById("sliceSpeech").innerText = "Let's fix it!";
+    safePlay("soundFail");
 
-    const fail = document.getElementById("soundFail")
-    if(fail){
-      fail.currentTime = 0
-      fail.play().catch(() => {})
-    }
-
-    setTimeout(startLevel, 1200)
+    setTimeout(() => {
+      startLevel();
+    }, 1200);
   }
 }
+
+window.showHow = showHow;
+window.backToStart = backToStart;
+window.startGame = startGame;
+window.selectTopping = selectTopping;
+window.servePizza = servePizza;
