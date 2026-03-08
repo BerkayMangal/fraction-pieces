@@ -1,153 +1,188 @@
-body{
-margin:0;
-font-family:Arial;
-background:#ffe8b5;
-text-align:center;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #ffe8b5;
+  color: #222;
 }
 
-.screen{
-display:none;
-padding:20px;
+.screen {
+  display: none;
+  padding: 20px;
 }
 
-.screen.active{
-display:block;
+.screen.active {
+  display: block;
 }
 
-.subtitle{
-margin-bottom:20px;
+h1 {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
-.bigBtn{
-padding:14px 24px;
-font-size:18px;
-margin:10px;
-border:none;
-border-radius:12px;
-cursor:pointer;
+.subtitle {
+  margin-bottom: 20px;
+  font-size: 18px;
 }
 
-.primary{
-background:#4CAF50;
-color:white;
+.bigBtn {
+  padding: 14px 24px;
+  font-size: 18px;
+  margin: 10px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  background: white;
 }
 
-#characters{
-display:flex;
-justify-content:center;
-gap:40px;
-margin-bottom:10px;
+.primary {
+  background: #4caf50;
+  color: white;
 }
 
-.character{
-font-size:18px;
+#characters {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
-.speech{
-background:white;
-border-radius:10px;
-padding:6px 10px;
-margin-top:5px;
-font-size:14px;
+.character {
+  font-size: 18px;
 }
 
-#pizza{
-display:grid;
-grid-template-columns:1fr 1fr;
-grid-template-rows:1fr 1fr;
-width:320px;
-height:320px;
-margin:20px auto;
-border-radius:50%;
-overflow:hidden;
-background:#f4b56a;
-border:6px solid #c97a2b;
+.charEmoji {
+  font-size: 42px;
 }
 
-.slice{
-border:2px solid rgba(0,0,0,0.15);
-cursor:pointer;
-transition:transform 0.2s;
-display:flex;
-align-items:center;
-justify-content:center;
-position:relative;
+.charName {
+  font-weight: bold;
+  margin-top: 4px;
 }
 
-.slice:hover{
-transform:scale(1.05);
+.speech {
+  background: white;
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-top: 6px;
+  font-size: 14px;
 }
 
-.cheese{
-background:#ffd84d;
+#order {
+  margin-top: 10px;
 }
 
-.olive{
-background:#222;
+#pizza {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 320px;
+  height: 320px;
+  margin: 20px auto;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f4b56a;
+  border: 8px solid #c97a2b;
 }
 
-.pepperoni{
-background:#e63946;
+.slice {
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-button{
-padding:10px 16px;
-margin:6px;
-font-size:16px;
-border:none;
-border-radius:10px;
-cursor:pointer;
+.slice:hover {
+  transform: scale(1.04);
 }
 
-.cheeseBtn{background:#ffd84d;}
-.oliveBtn{background:#333;color:white;}
-.pepperoniBtn{background:#e63946;color:white;}
-
-#serveButton{
-background:#4CAF50;
-color:white;
-margin-top:10px;
+.cheese {
+  background: #ffd84d;
 }
 
-#stars{
-font-size:30px;
-margin-top:10px;
+.olive {
+  background: #2b2b2b;
 }
 
-#message{
-font-size:22px;
-margin-top:10px;
+.pepperoni {
+  background: #e63946;
 }
 
-.miniPizza{
-display:grid;
-grid-template-columns:1fr 1fr;
-grid-template-rows:1fr 1fr;
-width:120px;
-height:120px;
-margin:10px auto;
-border-radius:50%;
-overflow:hidden;
-border:2px solid #333;
+.sliceIcon {
+  font-size: 42px;
+  pointer-events: none;
 }
 
-.miniSlice{
-border:1px solid #333;
+#toppings {
+  margin-top: 10px;
 }
 
-.sparkle{
-animation:sparkle 0.35s ease;
+button {
+  padding: 10px 16px;
+  margin: 6px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
-@keyframes sparkle{
-0%{transform:scale(1);}
-50%{transform:scale(1.15);}
-100%{transform:scale(1);}
+.cheeseBtn {
+  background: #ffd84d;
 }
 
-.sliceImg{
-width:70%;
-height:70%;
-object-fit:contain;
-pointer-events:none;
+.oliveBtn {
+  background: #333;
+  color: white;
+}
+
+.pepperoniBtn {
+  background: #e63946;
+  color: white;
+}
+
+#serveButton {
+  background: #4caf50;
+  color: white;
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+#stars {
+  font-size: 30px;
+  margin-top: 12px;
+}
+
+#message {
+  font-size: 22px;
+  margin-top: 10px;
+  min-height: 28px;
+}
+
+.miniPizza {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 120px;
+  height: 120px;
+  margin: 10px auto;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #333;
+}
+
+.miniSlice {
+  border: 1px solid #333;
+}
+
+.sparkle {
+  animation: sparkle 0.35s ease;
+}
+
+@keyframes sparkle {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
 }
