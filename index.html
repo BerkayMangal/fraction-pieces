@@ -10,6 +10,20 @@
 
 <h1>Fraction Pieces 🍕</h1>
 
+<div id="characters">
+
+<div class="character">
+👨‍🍳 Chef Mozza  
+<div class="speech">Let's make a pizza!</div>
+</div>
+
+<div class="character">
+🍕 Slice  
+<div class="speech">Follow the order!</div>
+</div>
+
+</div>
+
 <div id="game">
 
 <div id="order">
@@ -20,16 +34,26 @@
 <div id="pizza"></div>
 
 <div id="toppings">
-<button onclick="selectTopping('cheese')">Cheese</button>
-<button onclick="selectTopping('olive')">Olive</button>
-<button onclick="selectTopping('pepperoni')">Pepperoni</button>
+
+<button onclick="selectTopping('cheese')" class="cheeseBtn">🧀 Cheese</button>
+
+<button onclick="selectTopping('olive')" class="oliveBtn">🫒 Olive</button>
+
+<button onclick="selectTopping('pepperoni')" class="pepperoniBtn">🍕 Pepperoni</button>
+
 </div>
 
 <button id="serveButton" onclick="servePizza()">Serve Pizza</button>
 
+<div id="stars"></div>
+
 <div id="message"></div>
 
 </div>
+
+<audio id="soundPop" src="https://cdn.jsdelivr.net/gh/jshawl/AudioFX/pop.mp3"></audio>
+<audio id="soundSuccess" src="https://cdn.jsdelivr.net/gh/jshawl/AudioFX/success.mp3"></audio>
+<audio id="soundFail" src="https://cdn.jsdelivr.net/gh/jshawl/AudioFX/error.mp3"></audio>
 
 <script src="levels.js"></script>
 <script src="game.js"></script>
