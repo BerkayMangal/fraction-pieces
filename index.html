@@ -1,69 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fraction Pieces</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fraction Pieces</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <div id="startScreen" class="screen active">
-    <h1>Fraction Pieces 🍕</h1>
-    <p class="subtitle">Make the pizza that matches the order!</p>
-    <button class="bigBtn" onclick="showHow()">How to Play</button>
-    <button class="bigBtn primary" onclick="startGame()">Play</button>
-  </div>
+<div id="startScreen" class="screen active">
+<h1>Fraction Pieces 🍕</h1>
+<button id="playBtn">Play</button>
+<button id="howBtn">How to Play</button>
+</div>
 
-  <div id="howScreen" class="screen">
-    <h2>How to Play</h2>
-    <p>1. Tap a topping.</p>
-    <p>2. Tap pizza slices to fill them.</p>
-    <p>3. Match the order pizza.</p>
-    <button class="bigBtn" onclick="backToStart()">Back</button>
-  </div>
+<div id="howScreen" class="screen">
+<h2>How to Play</h2>
+<p>Tap a topping.</p>
+<p>Tap pizza slices.</p>
+<p>Match the order pizza.</p>
+<button id="backBtn">Back</button>
+</div>
 
-  <div id="gameScreen" class="screen">
-    <h1>Fraction Pieces 🍕</h1>
+<div id="gameScreen" class="screen">
 
-    <div id="characters">
-      <div class="character">
-        <div class="charEmoji">👨‍🍳</div>
-        <div class="charName">Chef Mozza</div>
-        <div id="chefSpeech" class="speech">Let's make a pizza!</div>
-      </div>
+<h1>Fraction Pieces 🍕</h1>
 
-      <div class="character">
-        <div class="charEmoji">🍕</div>
-        <div class="charName">Slice</div>
-        <div id="sliceSpeech" class="speech">Copy the order!</div>
-      </div>
-    </div>
+<div id="order">
+<h3>Customer Order</h3>
+<div id="orderPreview" class="miniPizza"></div>
+</div>
 
-    <div id="order">
-      <h3>Customer Order</h3>
-      <div id="orderPreview" class="miniPizza"></div>
-    </div>
+<div id="pizza"></div>
 
-    <div id="pizza"></div>
+<div id="toppings">
+<button data-top="cheese">🧀</button>
+<button data-top="olive">🫒</button>
+<button data-top="pepperoni">🍕</button>
+</div>
 
-    <div id="toppings">
-      <button type="button" onclick="selectTopping('cheese')" class="cheeseBtn">🧀 Cheese</button>
-      <button type="button" onclick="selectTopping('olive')" class="oliveBtn">🫒 Olive</button>
-      <button type="button" onclick="selectTopping('pepperoni')" class="pepperoniBtn">🍕 Pepperoni</button>
-    </div>
+<button id="serveBtn">Serve Pizza</button>
 
-    <button type="button" id="serveButton" onclick="servePizza()">Serve Pizza</button>
+<div id="stars"></div>
+<div id="message"></div>
 
-    <div id="stars"></div>
-    <div id="message"></div>
-  </div>
+</div>
 
-  <audio id="soundPop" src="https://cdn.jsdelivr.net/gh/jshawl/AudioFX/pop.mp3"></audio>
-  <audio id="soundSuccess" src="https://cdn.jsdelivr.net/gh/jshawl/AudioFX/success.mp3"></audio>
-  <audio id="soundFail" src="https://cdn.jsdelivr.net/gh/jshawl/AudioFX/error.mp3"></audio>
+<script src="levels.js"></script>
+<script src="game.js"></script>
 
-  <script src="levels.js"></script>
-  <script src="game.js"></script>
 </body>
 </html>
