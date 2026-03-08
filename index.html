@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Fraction Pieces</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Fraction Pieces 🍕</h1>
+
+<div id="game">
+
+<div id="order">
+<h2>Customer Order</h2>
+<div id="orderPreview"></div>
+</div>
+
+<div id="pizza"></div>
+
+<div id="toppings">
+<button onclick="selectTopping('cheese')">Cheese</button>
+<button onclick="selectTopping('olive')">Olive</button>
+<button onclick="selectTopping('pepperoni')">Pepperoni</button>
+</div>
+
+<button id="serveButton" onclick="servePizza()">Serve Pizza</button>
+
+<div id="message"></div>
+
+</div>
+
+<script src="levels.js"></script>
+<script src="game.js"></script>
+
+</body>
+</html>
