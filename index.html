@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<!-- ========== FLOATING BG ELEMENTS ========== -->
+<!-- Floating BG -->
 <div id="floatingBg"></div>
 
 <!-- ========== START SCREEN ========== -->
@@ -20,7 +20,7 @@
   <button id="howToPlayBtn" onclick="showHowToPlay()">? How to Play</button>
 </div>
 
-<!-- ========== HOW TO PLAY OVERLAY ========== -->
+<!-- ========== HOW TO PLAY ========== -->
 <div id="howToPlayOverlay" class="overlay hidden">
   <div class="card how-to-play-card">
     <h2>How to Play</h2>
@@ -43,7 +43,13 @@
     <div id="starCount"><span class="star-icon">&#9733;</span> <span id="totalStars">0</span></div>
   </div>
 
-  <!-- Chef speech bubble -->
+  <!-- Sound controls -->
+  <div id="soundControls">
+    <button id="musicBtn" onclick="toggleMusic()" class="sound-btn on" title="Music">&#9834;</button>
+    <button id="sfxBtn" onclick="toggleSfx()" class="sound-btn on" title="Sounds">&#128264;</button>
+  </div>
+
+  <!-- Chef bubble -->
   <div id="chefBubble">
     <div id="chefEmoji">&#129489;&#8205;&#127859;</div>
     <div id="chefText">Let's make a pizza!</div>
@@ -58,20 +64,20 @@
     <div id="orderFractions"></div>
   </div>
 
-  <!-- Main pizza area -->
+  <!-- Pizza area -->
   <div id="pizzaArea">
     <div id="pizzaPlate"></div>
     <svg id="mainPizza" viewBox="0 0 300 300" width="260" height="260"></svg>
     <div id="sliceNumbers"></div>
   </div>
 
-  <!-- Topping palette -->
+  <!-- Topping bar -->
   <div id="toppingBar">
     <div id="toppingTitle">Pick a topping!</div>
     <div id="toppingChoices"></div>
   </div>
 
-  <!-- Action buttons -->
+  <!-- Buttons -->
   <div id="actionButtons">
     <button id="resetBtn" onclick="resetPizza()">&#8634; Reset</button>
     <button id="checkBtn" onclick="checkPizza()">&#10003; Check!</button>
@@ -79,7 +85,7 @@
 
 </div>
 
-<!-- ========== FRACTION QUESTION OVERLAY ========== -->
+<!-- ========== FRACTION QUESTION ========== -->
 <div id="questionOverlay" class="overlay hidden">
   <div id="questionCard" class="card">
     <div class="card-emoji" id="questionEmoji">&#129300;</div>
@@ -91,7 +97,7 @@
   </div>
 </div>
 
-<!-- ========== CELEBRATION OVERLAY ========== -->
+<!-- ========== CELEBRATION ========== -->
 <div id="celebrationOverlay" class="overlay hidden">
   <div id="celebrationCard" class="card">
     <div id="celebEmoji"></div>
@@ -104,7 +110,7 @@
   <div id="flyingStars"></div>
 </div>
 
-<!-- ========== GAME COMPLETE OVERLAY ========== -->
+<!-- ========== GAME COMPLETE ========== -->
 <div id="completeOverlay" class="overlay hidden">
   <div id="completeCard" class="card">
     <div class="card-emoji">&#127942;</div>
