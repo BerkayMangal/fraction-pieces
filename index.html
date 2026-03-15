@@ -1,31 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Fraction Pieces</title>
 <link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
+<!-- ========== START SCREEN ========== -->
 <div id="startScreen">
-
-<img src="assets/start-screen.png" class="startImage">
-
-<button id="playButton">PLAY</button>
-
+  <img src="assets/start-screen.png" class="startImage" alt="Fraction Pieces">
+  <button id="playButton" onclick="startGame()">PLAY</button>
 </div>
 
+<!-- ========== GAME SCREEN ========== -->
 <div id="gameScreen">
 
-<h1>Fraction Pieces</h1>
+  <!-- Top bar -->
+  <div id="topBar">
+    <div id="levelBadge">Level <span id="levelNum">1</span></div>
+    <div id="starCount"><span class="star-icon">&#9733;</span> <span id="totalStars">0</span></div>
+  </div>
 
-<p>Game coming next step 🚀</p>
+  <!-- Order card -->
+  <div id="orderCard">
+    <div id="orderTitle">Order:</div>
+    <svg id="orderPizza" viewBox="0 0 120 120" width="90" height="90"></svg>
+    <div id="orderFractions"></div>
+  </div>
+
+  <!-- Main pizza area -->
+  <div id="pizzaArea">
+    <svg id="mainPizza" viewBox="0 0 300 300" width="280" height="280"></svg>
+  </div>
+
+  <!-- Topping palette -->
+  <div id="toppingBar">
+    <div id="toppingTitle">Tap a topping, then tap a slice!</div>
+    <div id="toppingChoices"></div>
+  </div>
+
+  <!-- Check / Reset buttons -->
+  <div id="actionButtons">
+    <button id="resetBtn" onclick="resetPizza()">Reset</button>
+    <button id="checkBtn" onclick="checkPizza()">Check My Pizza!</button>
+  </div>
 
 </div>
 
-<script src="game.js"></script>
+<!-- ========== FRACTION QUESTION OVERLAY ========== -->
+<div id="questionOverlay" class="overlay hidden">
+  <div id="questionCard" class="card">
+    <div class="card-emoji">&#129300;</div>
+    <h2 id="questionText"></h2>
+    <div id="answerChoices"></div>
+  </div>
+</div>
 
+<!-- ========== CELEBRATION OVERLAY ========== -->
+<div id="celebrationOverlay" class="overlay hidden">
+  <div id="celebrationCard" class="card">
+    <div id="celebStars"></div>
+    <h2 id="celebText"></h2>
+    <p id="celebSub"></p>
+    <button id="nextBtn" onclick="nextLevel()">Next Level &#10148;</button>
+  </div>
+  <div id="confettiContainer"></div>
+</div>
+
+<!-- ========== GAME COMPLETE OVERLAY ========== -->
+<div id="completeOverlay" class="overlay hidden">
+  <div id="completeCard" class="card">
+    <div class="card-emoji">&#127942;</div>
+    <h2>Pizza Master!</h2>
+    <p id="finalScore"></p>
+    <div id="finalStarRow"></div>
+    <button onclick="restartGame()">Play Again!</button>
+  </div>
+</div>
+
+<script src="levels.js"></script>
+<script src="game.js"></script>
 </body>
 </html>
+
