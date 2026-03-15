@@ -1,5 +1,5 @@
 /* ========================================
-   FRACTION PIECES - Game Engine
+   FRACTION PIECES v3 - Enhanced Game Engine
    ======================================== */
 
 // ===== STATE =====
@@ -10,37 +10,27 @@ let placedToppings = [null, null, null, null];
 let questionAttempts = 0;
 let gameActive = false;
 
-// ===== DOM REFS =====
 const $ = id => document.getElementById(id);
 
 // ===== CONSTANTS =====
-const CX = 150, CY = 150, R = 120, CR = 130;
+const CX = 150, CY = 150, R = 120;
 
 const TOPPING_COLORS = {
-  cheese:    { fill: '#ffd54f', stroke: '#f9a825', accent: '#ffb300', dots: '#f0a020' },
-  olive:     { fill: '#81c784', stroke: '#43a047', accent: '#388e3c', dots: '#2e7d32' },
-  pepperoni: { fill: '#ef5350', stroke: '#c62828', accent: '#d32f2f', dots: '#b71c1c' }
+  cheese:    { fill: '#ffd54f', stroke: '#f9a825', accent: '#ffb300' },
+  olive:     { fill: '#81c784', stroke: '#43a047', accent: '#388e3c' },
+  pepperoni: { fill: '#ef5350', stroke: '#c62828', accent: '#d32f2f' }
 };
 
-const TOPPING_NAMES = {
-  cheese: 'Cheese',
-  olive: 'Olive',
-  pepperoni: 'Pepperoni'
-};
+const TOPPING_EMOJI = { cheese: '\u{1F9C0}', olive: '\u{1FAD2}', pepperoni: '\u{1F355}' };
+const TOPPING_NAMES = { cheese: 'Cheese', olive: 'Olive', pepperoni: 'Pepperoni' };
 
-// Positions of topping decorations on each slice (relative to 300x300)
 const SLICE_DECO = [
-  // Slice 0: top-right
   [{ x: 195, y: 85 }, { x: 215, y: 115 }, { x: 185, y: 120 }],
-  // Slice 1: bottom-right
   [{ x: 195, y: 195 }, { x: 220, y: 215 }, { x: 190, y: 230 }],
-  // Slice 2: bottom-left
   [{ x: 105, y: 195 }, { x: 80, y: 215 }, { x: 110, y: 230 }],
-  // Slice 3: top-left
   [{ x: 105, y: 85 }, { x: 80, y: 115 }, { x: 115, y: 120 }]
 ];
 
-// Same for order pizza (scaled to 120x120, center 60,60, r=48)
 const ORDER_DECO = [
   [{ x: 78, y: 35 }, { x: 85, y: 48 }],
   [{ x: 78, y: 75 }, { x: 88, y: 85 }],
@@ -48,14 +38,78 @@ const ORDER_DECO = [
   [{ x: 42, y: 35 }, { x: 35, y: 48 }]
 ];
 
-// ===== AUDIO (Web Audio API) =====
+const Q_DECO = [
+  [{ x: 130, y: 56 }, { x: 143, y: 76 }, { x: 123, y: 80 }],
+  [{ x: 130, y: 130 }, { x: 147, y: 143 }, { x: 127, y: 153 }],
+  [{ x: 70, y: 130 }, { x: 53, y: 143 }, { x: 73, y: 153 }],
+  [{ x: 70, y: 56 }, { x: 53, y: 76 }, { x: 77, y: 80 }]
+];
+
+const SLICE_ANGLES = [[-90, 0], [0, 90], [90, 180], [180, 270]];
+
+const CHEF_MESSAGES = {
+  start: [
+    "Let's make a yummy pizza! \u{1F355}",
+    "New order coming in! \u{1F4CB}",
+    "Pizza time! Look at the order! \u{1F60B}",
+    "Ready to cook? Check the order! \u{1F468}\u{200D}\u{1F373}"
+  ],
+  pickTopping: [
+    "Pick a topping first! \u{1F446}",
+    "Tap a topping to start! \u{1F447}",
+    "Choose your topping! \u{1F60A}"
+  ],
+  placed: [
+    "Nice! Keep going! \u{1F44D}",
+    "Yum! More toppings! \u{1F60B}",
+    "Looking good! \u{2728}",
+    "Great choice! \u{1F31F}"
+  ],
+  allFilled: [
+    "Pizza looks ready! Hit Check! \u{2705}",
+    "All slices done! Check it! \u{1F389}",
+    "Looks delicious! Time to check! \u{1F60D}"
+  ],
+  wrong: [
+    "Hmm, not quite! Try again! \u{1F914}",
+    "Oops! Look at the order card! \u{1F9D0}",
+    "Almost! Check the order! \u{1F4CB}"
+  ],
+  correct: [
+    "Perfect pizza! \u{1F389}",
+    "You nailed it! \u{1F31F}",
+    "Delicious! \u{1F60D}"
+  ]
+};
+
+function randomFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// ===== FLOATING BACKGROUND =====
+function initFloatingBg() {
+  const container = $('floatingBg');
+  if (!container) return;
+  container.innerHTML = '';
+  const items = ['\u{1F355}','\u{1F9C0}','\u{1FAD2}','\u2B50','\u{1F525}','\u{1F345}','\u{1F952}','\u{1F374}'];
+  for (let i = 0; i < 15; i++) {
+    const el = document.createElement('div');
+    el.className = 'float-item';
+    el.textContent = items[i % items.length];
+    el.style.left = (Math.random() * 100) + '%';
+    el.style.fontSize = (18 + Math.random() * 16) + 'px';
+    el.style.setProperty('--dur', (10 + Math.random() * 15) + 's');
+    el.style.setProperty('--delay', (Math.random() * 10) + 's');
+    el.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+    container.appendChild(el);
+  }
+}
+
+// ===== AUDIO =====
 let audioCtx = null;
 function getAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   return audioCtx;
 }
-
-function playTone(freq, dur, type = 'sine', vol = 0.15) {
+function playTone(freq, dur, type = 'sine', vol = 0.13) {
   try {
     const ctx = getAudio();
     const osc = ctx.createOscillator();
@@ -70,20 +124,19 @@ function playTone(freq, dur, type = 'sine', vol = 0.15) {
     osc.stop(ctx.currentTime + dur);
   } catch (e) {}
 }
-
-function sfxPlace() { playTone(600, 0.12, 'sine', 0.12); }
+function sfxPlace() { playTone(500, 0.08); setTimeout(() => playTone(700, 0.1), 60); }
+function sfxSelect() { playTone(800, 0.08, 'sine', 0.1); }
 function sfxCorrect() {
-  playTone(523, 0.15); 
-  setTimeout(() => playTone(659, 0.15), 100);
-  setTimeout(() => playTone(784, 0.25), 200);
+  playTone(523, 0.12); 
+  setTimeout(() => playTone(659, 0.12), 80);
+  setTimeout(() => playTone(784, 0.2), 160);
 }
-function sfxWrong() { playTone(200, 0.3, 'triangle', 0.1); }
+function sfxWrong() { playTone(200, 0.25, 'triangle', 0.08); }
 function sfxCelebrate() {
-  [523, 587, 659, 784, 880].forEach((f, i) => {
-    setTimeout(() => playTone(f, 0.2, 'sine', 0.12), i * 100);
+  [523, 587, 659, 784, 880, 1047].forEach((f, i) => {
+    setTimeout(() => playTone(f, 0.18, 'sine', 0.1), i * 80);
   });
 }
-function sfxStar() { playTone(1047, 0.3, 'sine', 0.1); }
 
 // ===== SVG HELPERS =====
 function svgEl(tag, attrs = {}) {
@@ -91,162 +144,167 @@ function svgEl(tag, attrs = {}) {
   for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
   return el;
 }
-
-function slicePath(cx, cy, r, startAngle, endAngle) {
-  const s = startAngle * Math.PI / 180;
-  const e = endAngle * Math.PI / 180;
-  const x1 = cx + r * Math.cos(s);
-  const y1 = cy + r * Math.sin(s);
-  const x2 = cx + r * Math.cos(e);
-  const y2 = cy + r * Math.sin(e);
-  return `M${cx},${cy} L${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2} Z`;
+function slicePath(cx, cy, r, sa, ea) {
+  const s = sa * Math.PI / 180, e = ea * Math.PI / 180;
+  return `M${cx},${cy} L${cx + r * Math.cos(s)},${cy + r * Math.sin(s)} A${r},${r} 0 0,1 ${cx + r * Math.cos(e)},${cy + r * Math.sin(e)} Z`;
 }
 
-// Quarter angles: [top-right, bottom-right, bottom-left, top-left]
-const SLICE_ANGLES = [
-  [-90, 0], [0, 90], [90, 180], [180, 270]
-];
-
 // ===== DRAW PIZZA =====
-function drawPizza(svgElement, toppings, cx, cy, r, decoPositions, isOrder = false) {
-  svgElement.innerHTML = '';
+function drawPizza(svg, toppings, cx, cy, r, decos, isOrder = false) {
+  svg.innerHTML = '';
 
-  // Shadow under pizza
+  // Shadow
   if (!isOrder) {
-    svgElement.appendChild(svgEl('ellipse', {
-      cx, cy: cy + 8, rx: r + 6, ry: 12,
-      fill: 'rgba(0,0,0,0.08)'
+    svg.appendChild(svgEl('ellipse', { cx, cy: cy + 6, rx: r + 4, ry: 10, fill: 'rgba(0,0,0,0.06)' }));
+  }
+
+  // Crust
+  svg.appendChild(svgEl('circle', {
+    cx, cy, r: r + (isOrder ? 4 : 10),
+    fill: '#d4a056', stroke: '#b8863a', 'stroke-width': isOrder ? 1 : 2.5
+  }));
+  // Crust highlights
+  if (!isOrder) {
+    svg.appendChild(svgEl('circle', {
+      cx, cy, r: r + 10,
+      fill: 'none', stroke: '#e8be7a', 'stroke-width': 1, opacity: '0.5'
     }));
   }
 
-  // Crust ring
-  svgElement.appendChild(svgEl('circle', {
-    cx, cy, r: r + (isOrder ? 4 : 8),
-    fill: '#d4a056', stroke: '#b8863a', 'stroke-width': isOrder ? 1 : 2
-  }));
-
-  // Pizza base (cheese background)
-  svgElement.appendChild(svgEl('circle', {
+  // Base
+  svg.appendChild(svgEl('circle', {
     cx, cy, r,
     fill: '#ffe082', stroke: '#f0c040', 'stroke-width': isOrder ? 0.5 : 1
   }));
 
-  // Draw each slice
+  // Slices
   for (let i = 0; i < 4; i++) {
-    const topping = toppings[i];
+    const top = toppings[i];
     const [sa, ea] = SLICE_ANGLES[i];
     const g = svgEl('g');
 
-    if (topping) {
-      // Filled slice
-      const col = TOPPING_COLORS[topping];
-      const path = svgEl('path', {
+    if (top) {
+      const col = TOPPING_COLORS[top];
+      g.appendChild(svgEl('path', {
         d: slicePath(cx, cy, r, sa, ea),
-        fill: col.fill,
-        stroke: col.stroke,
-        'stroke-width': isOrder ? 0.5 : 1.5,
-        opacity: '0.85'
-      });
-      g.appendChild(path);
-
-      // Topping decorations
-      const deco = decoPositions[i];
-      deco.forEach(pos => {
-        if (topping === 'cheese') {
-          // Cheese bubbles
-          g.appendChild(svgEl('circle', {
-            cx: pos.x, cy: pos.y, r: isOrder ? 3 : 7,
-            fill: '#ffb300', opacity: '0.6'
-          }));
-          g.appendChild(svgEl('circle', {
-            cx: pos.x - (isOrder ? 1 : 2), cy: pos.y - (isOrder ? 1 : 2),
-            r: isOrder ? 1.5 : 3,
-            fill: '#ffe082', opacity: '0.8'
-          }));
-        } else if (topping === 'olive') {
-          // Olive circles
-          g.appendChild(svgEl('circle', {
-            cx: pos.x, cy: pos.y, r: isOrder ? 4 : 9,
-            fill: '#2e7d32', stroke: '#1b5e20', 'stroke-width': isOrder ? 0.5 : 1
-          }));
-          g.appendChild(svgEl('circle', {
-            cx: pos.x, cy: pos.y, r: isOrder ? 2 : 4,
-            fill: '#4caf50', opacity: '0.5'
-          }));
-        } else if (topping === 'pepperoni') {
-          // Pepperoni circles
-          g.appendChild(svgEl('circle', {
-            cx: pos.x, cy: pos.y, r: isOrder ? 4.5 : 10,
-            fill: '#c62828', stroke: '#8e0000', 'stroke-width': isOrder ? 0.5 : 1
-          }));
-          g.appendChild(svgEl('circle', {
-            cx: pos.x, cy: pos.y, r: isOrder ? 2.5 : 5,
-            fill: '#ef5350', opacity: '0.4'
-          }));
+        fill: col.fill, stroke: col.stroke,
+        'stroke-width': isOrder ? 0.5 : 1.5, opacity: '0.88'
+      }));
+      // Decorations
+      decos[i].forEach(pos => {
+        if (top === 'cheese') {
+          g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 3 : 7, fill: '#ffb300', opacity: '0.55' }));
+          g.appendChild(svgEl('circle', { cx: pos.x - (isOrder ? 1 : 2), cy: pos.y - (isOrder ? 1 : 2), r: isOrder ? 1.5 : 3.5, fill: '#fff3c4', opacity: '0.7' }));
+        } else if (top === 'olive') {
+          g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 4 : 9, fill: '#2e7d32', stroke: '#1b5e20', 'stroke-width': isOrder ? 0.5 : 1 }));
+          g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 1.8 : 4, fill: '#81c784', opacity: '0.45' }));
+        } else if (top === 'pepperoni') {
+          g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 4.5 : 10, fill: '#c62828', stroke: '#8e0000', 'stroke-width': isOrder ? 0.5 : 1 }));
+          g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 2.5 : 5, fill: '#ef5350', opacity: '0.35' }));
+          g.appendChild(svgEl('circle', { cx: pos.x - (isOrder?1:3), cy: pos.y - (isOrder?1:3), r: isOrder ? 1 : 2, fill: '#ff8a80', opacity: '0.4' }));
         }
       });
     } else if (!isOrder) {
-      // Empty slice (dough visible, lighter)
       g.appendChild(svgEl('path', {
         d: slicePath(cx, cy, r, sa, ea),
-        fill: '#ffe8b0',
-        stroke: '#e0c878',
-        'stroke-width': 1.5,
-        'stroke-dasharray': '6 4',
-        opacity: '0.7'
+        fill: '#ffe8b0', stroke: '#e0c878',
+        'stroke-width': 1.5, 'stroke-dasharray': '8 5', opacity: '0.6'
       }));
-    }
-
-    // Click target for game pizza
-    if (!isOrder) {
-      const hitArea = svgEl('path', {
-        d: slicePath(cx, cy, r, sa, ea),
-        fill: 'transparent',
-        cursor: 'pointer',
-        class: 'pizza-slice',
-        'data-slice': i
+      // Question mark on empty slice
+      const mid = (sa + ea) / 2 * Math.PI / 180;
+      const tx = cx + r * 0.55 * Math.cos(mid);
+      const ty = cy + r * 0.55 * Math.sin(mid);
+      const txt = svgEl('text', {
+        x: tx, y: ty + 5,
+        'text-anchor': 'middle',
+        'font-size': '22', 'font-family': 'Fredoka, sans-serif',
+        fill: '#d4b080', opacity: '0.6', 'font-weight': '600'
       });
-      hitArea.addEventListener('click', () => onSliceClick(i));
-      g.appendChild(hitArea);
+      txt.textContent = '?';
+      g.appendChild(txt);
     }
 
-    svgElement.appendChild(g);
+    // Click target
+    if (!isOrder) {
+      const hit = svgEl('path', {
+        d: slicePath(cx, cy, r, sa, ea),
+        fill: 'transparent', cursor: 'pointer',
+        class: 'pizza-slice', 'data-slice': i
+      });
+      hit.addEventListener('click', () => onSliceClick(i));
+      g.appendChild(hit);
+    }
+    svg.appendChild(g);
   }
 
-  // Center dot
-  svgElement.appendChild(svgEl('circle', {
-    cx, cy, r: isOrder ? 3 : 6,
-    fill: '#d4a056', stroke: '#b8863a', 'stroke-width': isOrder ? 0.5 : 1
+  // Center
+  svg.appendChild(svgEl('circle', {
+    cx, cy, r: isOrder ? 3 : 7,
+    fill: '#d4a056', stroke: '#b8863a', 'stroke-width': isOrder ? 0.5 : 1.5
   }));
 
-  // Divider lines
+  // Dividers
   for (let i = 0; i < 4; i++) {
-    const angle = (SLICE_ANGLES[i][0]) * Math.PI / 180;
-    svgElement.appendChild(svgEl('line', {
+    const a = SLICE_ANGLES[i][0] * Math.PI / 180;
+    svg.appendChild(svgEl('line', {
       x1: cx, y1: cy,
-      x2: cx + r * Math.cos(angle),
-      y2: cy + r * Math.sin(angle),
-      stroke: '#c49040',
-      'stroke-width': isOrder ? 0.8 : 2,
-      opacity: '0.6'
+      x2: cx + r * Math.cos(a), y2: cy + r * Math.sin(a),
+      stroke: '#c49040', 'stroke-width': isOrder ? 0.8 : 2, opacity: '0.5'
     }));
   }
 }
 
-// ===== TOPPING PALETTE =====
-function buildToppingBar(levelOrder) {
+// ===== PROGRESS DOTS =====
+function updateProgressDots() {
+  const container = $('progressDots');
+  container.innerHTML = '';
+  for (let i = 0; i < levels.length; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'prog-dot ' + (i < currentLevel ? 'done' : i === currentLevel ? 'current' : 'future');
+    container.appendChild(dot);
+  }
+}
+
+// ===== SLICE NUMBERS =====
+function updateSliceNumbers() {
+  const container = $('sliceNumbers');
+  container.innerHTML = '';
+  const positions = [
+    { top: '18%', left: '62%' },
+    { top: '62%', left: '62%' },
+    { top: '62%', left: '18%' },
+    { top: '18%', left: '18%' }
+  ];
+  for (let i = 0; i < 4; i++) {
+    const num = document.createElement('div');
+    num.className = 'slice-num';
+    num.textContent = i + 1;
+    num.style.top = positions[i].top;
+    num.style.left = positions[i].left;
+    container.appendChild(num);
+  }
+}
+
+// ===== CHEF SPEECH =====
+function chefSay(category) {
+  const msg = randomFrom(CHEF_MESSAGES[category]);
+  $('chefText').textContent = msg;
+  $('chefBubble').style.animation = 'none';
+  $('chefBubble').offsetHeight; // reflow
+  $('chefBubble').style.animation = 'bubbleIn 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+}
+
+// ===== TOPPING BAR =====
+function buildToppingBar(order) {
   const container = $('toppingChoices');
   container.innerHTML = '';
-
-  // Find unique toppings needed for this level
-  const needed = [...new Set(levelOrder)];
-
+  const needed = [...new Set(order)];
   needed.forEach(topping => {
     const btn = document.createElement('div');
     btn.className = 'topping-btn';
     btn.dataset.topping = topping;
     btn.innerHTML = `
-      <div class="topping-preview preview-${topping}"></div>
+      <div class="topping-preview preview-${topping}">${TOPPING_EMOJI[topping]}</div>
       <div class="topping-label">${TOPPING_NAMES[topping]}</div>
     `;
     btn.addEventListener('click', () => selectTopping(topping, btn));
@@ -254,21 +312,17 @@ function buildToppingBar(levelOrder) {
   });
 }
 
-function selectTopping(topping, btnEl) {
+function selectTopping(topping, btn) {
   selectedTopping = topping;
-  // Highlight selected
   document.querySelectorAll('.topping-btn').forEach(b => b.classList.remove('selected'));
-  btnEl.classList.add('selected');
-  sfxPlace();
+  btn.classList.add('selected');
+  sfxSelect();
 
-  // Highlight available (empty) slices
+  $('toppingTitle').textContent = `Now tap a slice! \u{1F447}`;
+
   document.querySelectorAll('.pizza-slice').forEach(el => {
     const idx = parseInt(el.dataset.slice);
-    if (placedToppings[idx] === null) {
-      el.classList.add('highlight');
-    } else {
-      el.classList.remove('highlight');
-    }
+    el.classList.toggle('highlight', placedToppings[idx] === null);
   });
 }
 
@@ -277,58 +331,42 @@ function onSliceClick(index) {
   if (!gameActive) return;
 
   if (!selectedTopping) {
-    // Shake to indicate they need to pick a topping first
-    const pizza = $('mainPizza');
-    pizza.classList.add('error-shake');
-    setTimeout(() => pizza.classList.remove('error-shake'), 400);
+    $('mainPizza').classList.add('error-shake');
+    setTimeout(() => $('mainPizza').classList.remove('error-shake'), 400);
     sfxWrong();
-
-    $('toppingTitle').textContent = '👆 First pick a topping!';
-    setTimeout(() => {
-      $('toppingTitle').textContent = 'Tap a topping, then tap a slice!';
-    }, 1500);
+    chefSay('pickTopping');
     return;
   }
 
   if (placedToppings[index] !== null) {
-    // Already placed, remove it
     placedToppings[index] = null;
-    sfxPlace();
   } else {
-    // Place topping
     placedToppings[index] = selectedTopping;
     sfxPlace();
+    chefSay('placed');
   }
 
-  // Redraw pizza
   drawPizza($('mainPizza'), placedToppings, CX, CY, R, SLICE_DECO, false);
 
-  // Add pop animation to placed slice
-  const sliceEls = document.querySelectorAll('.pizza-slice');
-  sliceEls.forEach(el => {
+  document.querySelectorAll('.pizza-slice').forEach(el => {
     const idx = parseInt(el.dataset.slice);
     if (idx === index && placedToppings[index] !== null) {
       el.parentElement.classList.add('slice-placed');
-      setTimeout(() => el.parentElement.classList.remove('slice-placed'), 350);
+      setTimeout(() => el.parentElement.classList.remove('slice-placed'), 400);
     }
-    // Update highlights
-    if (selectedTopping && placedToppings[idx] === null) {
-      el.classList.add('highlight');
-    } else {
-      el.classList.remove('highlight');
-    }
+    el.classList.toggle('highlight', selectedTopping && placedToppings[idx] === null);
   });
 
-  // Show check button when all slices filled
   const allFilled = placedToppings.every(t => t !== null);
-  const checkBtn = $('checkBtn');
   if (allFilled) {
-    checkBtn.classList.add('visible');
+    $('checkBtn').classList.add('visible');
+    $('toppingTitle').textContent = 'Pizza ready? Hit Check! \u{2705}';
+    chefSay('allFilled');
     selectedTopping = null;
     document.querySelectorAll('.topping-btn').forEach(b => b.classList.remove('selected'));
     document.querySelectorAll('.pizza-slice').forEach(el => el.classList.remove('highlight'));
   } else {
-    checkBtn.classList.remove('visible');
+    $('checkBtn').classList.remove('visible');
   }
 }
 
@@ -341,19 +379,15 @@ function checkPizza() {
   if (correct) {
     sfxCorrect();
     gameActive = false;
-    // Show fraction question
-    setTimeout(() => showFractionQuestion(), 600);
+    chefSay('correct');
+    setTimeout(() => showFractionQuestion(), 700);
   } else {
     sfxWrong();
-    // Shake and show hint
-    const pizza = $('mainPizza');
-    pizza.classList.add('error-shake');
-    setTimeout(() => pizza.classList.remove('error-shake'), 400);
-
-    $('toppingTitle').textContent = 'Not quite! Check the order card 🧾';
-    setTimeout(() => {
-      $('toppingTitle').textContent = 'Tap a topping, then tap a slice!';
-    }, 2000);
+    $('mainPizza').classList.add('error-shake');
+    setTimeout(() => $('mainPizza').classList.remove('error-shake'), 400);
+    chefSay('wrong');
+    $('toppingTitle').textContent = 'Check the order card! \u{1F4CB}';
+    setTimeout(() => { $('toppingTitle').textContent = 'Pick a topping!'; }, 2500);
   }
 }
 
@@ -362,35 +396,23 @@ function showFractionQuestion() {
   const level = levels[currentLevel];
   questionAttempts = 0;
 
-  // Count toppings
   const counts = {};
   level.order.forEach(t => { counts[t] = (counts[t] || 0) + 1; });
 
-  // Pick a topping to ask about (prefer non-4 counts for more interesting questions)
   const toppings = Object.keys(counts);
-  let askAbout;
   const interesting = toppings.filter(t => counts[t] !== 4);
-  if (interesting.length > 0) {
-    askAbout = interesting[Math.floor(Math.random() * interesting.length)];
-  } else {
-    askAbout = toppings[0];
-  }
+  const askAbout = interesting.length > 0 ? randomFrom(interesting) : toppings[0];
+  const correctFraction = `${counts[askAbout]}/4`;
 
-  const correctCount = counts[askAbout];
-  const correctFraction = `${correctCount}/4`;
+  $('questionText').textContent = `What fraction is ${TOPPING_NAMES[askAbout]}?`;
+  $('questionEmoji').textContent = TOPPING_EMOJI[askAbout];
 
-  // Build question
-  $('questionText').textContent = `What fraction of the pizza is ${TOPPING_NAMES[askAbout]}?`;
-
-  // Generate answer choices (always include 1/4, 2/4, 3/4, 4/4)
-  const allFractions = ['1/4', '2/4', '3/4', '4/4'];
-  const choices = allFractions;
+  // Draw question pizza
+  drawPizza($('questionPizza'), level.order, 100, 100, 80, Q_DECO, true);
 
   const container = $('answerChoices');
   container.innerHTML = '';
-
-  // Shuffle choices
-  const shuffled = [...choices].sort(() => Math.random() - 0.5);
+  const shuffled = ['1/4', '2/4', '3/4', '4/4'].sort(() => Math.random() - 0.5);
 
   shuffled.forEach(frac => {
     const btn = document.createElement('button');
@@ -400,46 +422,34 @@ function showFractionQuestion() {
     container.appendChild(btn);
   });
 
-  // Show overlay
   $('questionOverlay').classList.remove('hidden');
   $('questionOverlay').classList.add('fade-in');
 }
 
 function handleAnswer(btn, chosen, correct) {
   if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
-
   questionAttempts++;
 
   if (chosen === correct) {
     btn.classList.add('correct');
     sfxCorrect();
-
-    // Disable all buttons
-    document.querySelectorAll('.answer-btn').forEach(b => {
-      b.style.pointerEvents = 'none';
-    });
-
-    // Calculate stars
-    const stars = questionAttempts === 1 ? 2 : 1;
+    document.querySelectorAll('.answer-btn').forEach(b => b.style.pointerEvents = 'none');
+    const stars = questionAttempts === 1 ? 3 : questionAttempts === 2 ? 2 : 1;
     totalStars += stars;
-
-    // Show celebration after a beat
     setTimeout(() => {
       $('questionOverlay').classList.add('hidden');
       showCelebration(stars);
-    }, 800);
+    }, 900);
   } else {
     btn.classList.add('wrong');
     sfxWrong();
     btn.style.pointerEvents = 'none';
-
-    // Highlight correct after 2 wrong attempts
-    if (questionAttempts >= 2) {
+    if (questionAttempts >= 3) {
       setTimeout(() => {
         document.querySelectorAll('.answer-btn').forEach(b => {
           if (b.textContent === correct) b.classList.add('correct');
         });
-      }, 600);
+      }, 500);
     }
   }
 }
@@ -448,104 +458,113 @@ function handleAnswer(btn, chosen, correct) {
 function showCelebration(stars) {
   sfxCelebrate();
 
-  // Stars display
-  const starStr = '⭐'.repeat(stars) + (stars < 2 ? '☆'.repeat(2 - stars) : '');
-  $('celebStars').textContent = starStr;
+  const emojis = ['\u{1F389}','\u{1F38A}','\u{1F973}','\u{1F929}'];
+  $('celebEmoji').textContent = randomFrom(emojis);
 
-  // Text
-  const texts = stars === 2
-    ? ['Perfect! 🎉', 'Amazing! 🌟', 'Superstar! ✨', 'Incredible! 🔥']
-    : ['Good job! 👏', 'Nice work! 💪', 'Well done! 🙌'];
-  $('celebText').textContent = texts[Math.floor(Math.random() * texts.length)];
+  $('celebStars').textContent = '\u2B50'.repeat(stars) + '\u2606'.repeat(3 - stars);
 
-  $('celebSub').textContent = `You earned ${stars} star${stars > 1 ? 's' : ''}!`;
+  const texts3 = ['PERFECT! \u{1F31F}', 'INCREDIBLE! \u{1F525}', 'SUPERSTAR! \u{1F680}'];
+  const texts2 = ['Great job! \u{1F389}', 'Awesome! \u{1F44F}', 'Fantastic! \u{2728}'];
+  const texts1 = ['Good try! \u{1F44D}', 'Nice work! \u{1F60A}', 'Keep going! \u{1F4AA}'];
+  $('celebText').textContent = randomFrom(stars === 3 ? texts3 : stars === 2 ? texts2 : texts1);
+  $('celebSub').textContent = `+${stars} star${stars > 1 ? 's' : ''}!`;
 
-  // Update total stars display
   $('totalStars').textContent = totalStars;
+  $('starCount').classList.add('star-earned');
+  setTimeout(() => $('starCount').classList.remove('star-earned'), 600);
 
-  // Change button text for last level
-  if (currentLevel >= levels.length - 1) {
-    $('nextBtn').textContent = 'See Results 🏆';
-  } else {
-    $('nextBtn').textContent = 'Next Level ➜';
-  }
+  $('nextBtn').textContent = currentLevel >= levels.length - 1 ? 'See Results \u{1F3C6}' : 'Next Level \u{27A1}';
 
-  // Show overlay
   $('celebrationOverlay').classList.remove('hidden');
   $('celebrationOverlay').classList.add('fade-in');
 
-  // Spawn confetti
-  spawnConfetti();
+  spawnConfetti($('confettiContainer'));
+  spawnFlyingStars(stars);
 }
 
-function spawnConfetti() {
-  const container = $('confettiContainer');
+function spawnConfetti(container) {
   container.innerHTML = '';
+  const colors = ['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#54a0ff','#5f27cd','#01a3a4','#ff8c00','#4caf50','#e056fd'];
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.width = (6 + Math.random() * 10) + 'px';
+    p.style.height = (6 + Math.random() * 10) + 'px';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : Math.random() > 0.5 ? '2px' : '0';
+    p.style.setProperty('--delay', (Math.random() * 1) + 's');
+    p.style.setProperty('--fall-dur', (2 + Math.random() * 2.5) + 's');
+    p.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+    p.style.setProperty('--spin', (Math.random() * 1080) + 'deg');
+    container.appendChild(p);
+  }
+}
 
-  const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#01a3a4', '#ff8c00', '#4caf50'];
-
-  for (let i = 0; i < 50; i++) {
-    const piece = document.createElement('div');
-    piece.className = 'confetti';
-    piece.style.left = Math.random() * 100 + 'vw';
-    piece.style.width = (6 + Math.random() * 8) + 'px';
-    piece.style.height = (6 + Math.random() * 8) + 'px';
-    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-    piece.style.setProperty('--delay', (Math.random() * 0.8) + 's');
-    piece.style.setProperty('--fall-dur', (2 + Math.random() * 2) + 's');
-    piece.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
-    piece.style.setProperty('--spin', (Math.random() * 1080) + 'deg');
-    container.appendChild(piece);
+function spawnFlyingStars(count) {
+  const container = $('flyingStars');
+  container.innerHTML = '';
+  for (let i = 0; i < count * 3; i++) {
+    const s = document.createElement('div');
+    s.className = 'flying-star';
+    s.textContent = '\u2B50';
+    s.style.left = (30 + Math.random() * 40) + '%';
+    s.style.top = (40 + Math.random() * 20) + '%';
+    s.style.setProperty('--d', (i * 0.12) + 's');
+    s.style.setProperty('--tx', (Math.random() * 200 - 100) + 'px');
+    s.style.setProperty('--ty', -(100 + Math.random() * 200) + 'px');
+    s.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+    container.appendChild(s);
   }
 }
 
 // ===== LEVEL MANAGEMENT =====
-function loadLevel(levelIndex) {
-  currentLevel = levelIndex;
-  const level = levels[levelIndex];
+function loadLevel(idx) {
+  currentLevel = idx;
+  const level = levels[idx];
 
-  // Reset state
   selectedTopping = null;
   placedToppings = [null, null, null, null];
   gameActive = true;
 
-  // Update UI
-  $('levelNum').textContent = levelIndex + 1;
+  $('levelNum').textContent = idx + 1;
   $('totalStars').textContent = totalStars;
   $('checkBtn').classList.remove('visible');
 
-  // Draw order pizza
+  updateProgressDots();
+  updateSliceNumbers();
+
+  // Order pizza
   drawPizza($('orderPizza'), level.order, 60, 60, 46, ORDER_DECO, true);
 
-  // Order fraction tags
+  // Order tags
   const counts = {};
   level.order.forEach(t => { counts[t] = (counts[t] || 0) + 1; });
   const fracContainer = $('orderFractions');
   fracContainer.innerHTML = '';
-  Object.entries(counts).forEach(([topping, count]) => {
+  Object.entries(counts).forEach(([top, count], i) => {
     const tag = document.createElement('span');
-    tag.className = `order-tag ${topping}`;
-    tag.textContent = `${count}/4 ${TOPPING_NAMES[topping]}`;
+    tag.className = `order-tag ${top}`;
+    tag.textContent = `${TOPPING_EMOJI[top]} ${count}/4`;
+    tag.style.animationDelay = (i * 0.1) + 's';
     fracContainer.appendChild(tag);
   });
 
-  // Draw empty game pizza
+  // Empty pizza
   drawPizza($('mainPizza'), placedToppings, CX, CY, R, SLICE_DECO, false);
 
-  // Build topping bar
   buildToppingBar(level.order);
+  chefSay('start');
+  $('toppingTitle').textContent = 'Pick a topping!';
 
-  $('toppingTitle').textContent = 'Tap a topping, then tap a slice!';
-
-  // Level enter animation
   $('gameScreen').classList.add('level-enter');
-  setTimeout(() => $('gameScreen').classList.remove('level-enter'), 500);
+  setTimeout(() => $('gameScreen').classList.remove('level-enter'), 600);
 }
 
 function nextLevel() {
   $('celebrationOverlay').classList.add('hidden');
   $('confettiContainer').innerHTML = '';
+  $('flyingStars').innerHTML = '';
 
   if (currentLevel >= levels.length - 1) {
     showGameComplete();
@@ -555,26 +574,25 @@ function nextLevel() {
 }
 
 function showGameComplete() {
-  const maxStars = levels.length * 2;
+  const maxStars = levels.length * 3;
+  $('finalScore').textContent = `You collected ${totalStars} / ${maxStars} stars!`;
 
-  $('finalScore').textContent = `You collected ${totalStars} out of ${maxStars} stars!`;
-
-  // Star row
   const row = $('finalStarRow');
   row.innerHTML = '';
   for (let i = 0; i < maxStars; i++) {
     const s = document.createElement('span');
     s.className = 'final-star' + (i >= totalStars ? ' empty' : '');
-    s.textContent = '⭐';
-    s.style.setProperty('--d', (i * 0.08) + 's');
+    s.textContent = '\u2B50';
+    s.style.setProperty('--d', (i * 0.05) + 's');
     row.appendChild(s);
   }
 
   $('completeOverlay').classList.remove('hidden');
   $('completeOverlay').classList.add('fade-in');
   sfxCelebrate();
-  setTimeout(sfxCelebrate, 500);
-  spawnConfetti();
+  setTimeout(sfxCelebrate, 400);
+  setTimeout(sfxCelebrate, 800);
+  spawnConfetti($('confettiContainer2'));
 }
 
 // ===== START / RESTART =====
@@ -588,7 +606,6 @@ function startGame() {
 
 function restartGame() {
   $('completeOverlay').classList.add('hidden');
-  $('confettiContainer').innerHTML = '';
   currentLevel = 0;
   totalStars = 0;
   loadLevel(0);
@@ -601,7 +618,19 @@ function resetPizza() {
   document.querySelectorAll('.topping-btn').forEach(b => b.classList.remove('selected'));
   drawPizza($('mainPizza'), placedToppings, CX, CY, R, SLICE_DECO, false);
   $('checkBtn').classList.remove('visible');
-  $('toppingTitle').textContent = 'Tap a topping, then tap a slice!';
-  sfxPlace();
+  $('toppingTitle').textContent = 'Pick a topping!';
+  chefSay('start');
+  sfxSelect();
 }
+
+function showHowToPlay() {
+  $('howToPlayOverlay').classList.remove('hidden');
+  $('howToPlayOverlay').classList.add('fade-in');
+}
+function hideHowToPlay() {
+  $('howToPlayOverlay').classList.add('hidden');
+}
+
+// ===== INIT =====
+initFloatingBg();
 

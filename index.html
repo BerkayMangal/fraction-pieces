@@ -10,10 +10,27 @@
 </head>
 <body>
 
+<!-- ========== FLOATING BG ELEMENTS ========== -->
+<div id="floatingBg"></div>
+
 <!-- ========== START SCREEN ========== -->
 <div id="startScreen">
   <img src="assets/start-screen.png" class="startImage" alt="Fraction Pieces">
   <button id="playButton" onclick="startGame()">PLAY</button>
+  <button id="howToPlayBtn" onclick="showHowToPlay()">? How to Play</button>
+</div>
+
+<!-- ========== HOW TO PLAY OVERLAY ========== -->
+<div id="howToPlayOverlay" class="overlay hidden">
+  <div class="card how-to-play-card">
+    <h2>How to Play</h2>
+    <div class="how-step"><span class="how-num">1</span><span>Look at the <b>order card</b> to see what pizza to make</span></div>
+    <div class="how-step"><span class="how-num">2</span><span>Tap a <b>topping</b> to pick it up</span></div>
+    <div class="how-step"><span class="how-num">3</span><span>Tap a <b>pizza slice</b> to place it</span></div>
+    <div class="how-step"><span class="how-num">4</span><span>Press <b>Check</b> when your pizza is ready!</span></div>
+    <div class="how-step"><span class="how-num">5</span><span>Answer the <b>fraction question</b> to earn stars!</span></div>
+    <button onclick="hideHowToPlay()">Got it!</button>
+  </div>
 </div>
 
 <!-- ========== GAME SCREEN ========== -->
@@ -22,31 +39,42 @@
   <!-- Top bar -->
   <div id="topBar">
     <div id="levelBadge">Level <span id="levelNum">1</span></div>
+    <div id="progressDots"></div>
     <div id="starCount"><span class="star-icon">&#9733;</span> <span id="totalStars">0</span></div>
+  </div>
+
+  <!-- Chef speech bubble -->
+  <div id="chefBubble">
+    <div id="chefEmoji">&#129489;&#8205;&#127859;</div>
+    <div id="chefText">Let's make a pizza!</div>
   </div>
 
   <!-- Order card -->
   <div id="orderCard">
-    <div id="orderTitle">Order:</div>
-    <svg id="orderPizza" viewBox="0 0 120 120" width="90" height="90"></svg>
+    <div id="orderLeft">
+      <div id="orderTitle">Order</div>
+      <svg id="orderPizza" viewBox="0 0 120 120" width="80" height="80"></svg>
+    </div>
     <div id="orderFractions"></div>
   </div>
 
   <!-- Main pizza area -->
   <div id="pizzaArea">
-    <svg id="mainPizza" viewBox="0 0 300 300" width="280" height="280"></svg>
+    <div id="pizzaPlate"></div>
+    <svg id="mainPizza" viewBox="0 0 300 300" width="260" height="260"></svg>
+    <div id="sliceNumbers"></div>
   </div>
 
   <!-- Topping palette -->
   <div id="toppingBar">
-    <div id="toppingTitle">Tap a topping, then tap a slice!</div>
+    <div id="toppingTitle">Pick a topping!</div>
     <div id="toppingChoices"></div>
   </div>
 
-  <!-- Check / Reset buttons -->
+  <!-- Action buttons -->
   <div id="actionButtons">
-    <button id="resetBtn" onclick="resetPizza()">Reset</button>
-    <button id="checkBtn" onclick="checkPizza()">Check My Pizza!</button>
+    <button id="resetBtn" onclick="resetPizza()">&#8634; Reset</button>
+    <button id="checkBtn" onclick="checkPizza()">&#10003; Check!</button>
   </div>
 
 </div>
@@ -54,8 +82,11 @@
 <!-- ========== FRACTION QUESTION OVERLAY ========== -->
 <div id="questionOverlay" class="overlay hidden">
   <div id="questionCard" class="card">
-    <div class="card-emoji">&#129300;</div>
+    <div class="card-emoji" id="questionEmoji">&#129300;</div>
     <h2 id="questionText"></h2>
+    <div id="questionPizzaWrap">
+      <svg id="questionPizza" viewBox="0 0 200 200" width="140" height="140"></svg>
+    </div>
     <div id="answerChoices"></div>
   </div>
 </div>
@@ -63,12 +94,14 @@
 <!-- ========== CELEBRATION OVERLAY ========== -->
 <div id="celebrationOverlay" class="overlay hidden">
   <div id="celebrationCard" class="card">
+    <div id="celebEmoji"></div>
     <div id="celebStars"></div>
     <h2 id="celebText"></h2>
     <p id="celebSub"></p>
     <button id="nextBtn" onclick="nextLevel()">Next Level &#10148;</button>
   </div>
   <div id="confettiContainer"></div>
+  <div id="flyingStars"></div>
 </div>
 
 <!-- ========== GAME COMPLETE OVERLAY ========== -->
@@ -80,6 +113,7 @@
     <div id="finalStarRow"></div>
     <button onclick="restartGame()">Play Again!</button>
   </div>
+  <div id="confettiContainer2"></div>
 </div>
 
 <script src="levels.js"></script>
