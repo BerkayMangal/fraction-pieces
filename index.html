@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fractions">
-<link rel="stylesheet" href="style.css?v=9">
+<link rel="stylesheet" href="style.css?v=10">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -25,14 +25,20 @@
 
 <!-- ========== START SCREEN ========== -->
 <div id="startScreen">
-  <img src="assets/start-screen.jpg" class="startImage" alt="Fraction Pieces">
-  <button id="playButton" onclick="startGame()">PLAY</button>
-  <button id="howToPlayBtn" onclick="showHowToPlay()">? How to Play</button>
-  <button id="shopBtnOverlay" onclick="showShop()">Pizza Shop</button>
-  <div id="startTopBtns">
-    <button class="round-btn" onclick="showMap()" title="Levels">&#128506;</button>
-    <button class="round-btn" onclick="showAchievements()" title="Badges">&#127942;</button>
-    <button class="round-btn" onclick="showSettings()" title="Settings">&#9881;</button>
+  <div id="startHeroWrap">
+    <img src="assets/start-hero.jpg" class="startImage" alt="Fraction Pieces">
+  </div>
+  <div id="startMenu">
+    <button id="playButton" onclick="startGame()">&#9654; PLAY</button>
+    <div class="start-row">
+      <button class="start-btn alt" onclick="showMap()">&#128506; Levels</button>
+      <button class="start-btn alt" onclick="showShop()">&#127829; Pizza Shop</button>
+    </div>
+    <div class="start-row">
+      <button class="start-btn ghost" onclick="showHowToPlay()">&#10067; Help</button>
+      <button class="start-btn ghost" onclick="showAchievements()">&#127942; Badges</button>
+      <button class="start-btn ghost" onclick="showSettings()">&#9881; Settings</button>
+    </div>
   </div>
 </div>
 
@@ -333,10 +339,10 @@
 <!-- generic reward toast (shared) -->
 <div id="achToast"></div>
 
-<script src="levels.js?v=9"></script>
-<script src="game.js?v=9"></script>
-<script src="shop.js?v=9"></script>
-<script src="extras.js?v=9"></script>
+<script src="levels.js?v=10"></script>
+<script src="game.js?v=10"></script>
+<script src="shop.js?v=10"></script>
+<script src="extras.js?v=10"></script>
 <script>
 if ('serviceWorker' in navigator) {
   var fp_refreshing = false;
@@ -344,7 +350,7 @@ if ('serviceWorker' in navigator) {
     if (fp_refreshing) return; fp_refreshing = true; location.reload();
   });
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=9').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=10').catch(function () {});
   });
 }
 </script>
