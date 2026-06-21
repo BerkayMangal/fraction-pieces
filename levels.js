@@ -7,6 +7,9 @@ const levels = [
   { order: ["olive", "olive", "pepperoni", "pepperoni"] },
   { order: ["cheese", "olive", "pepperoni", "cheese"] },
   { order: ["pepperoni", "olive", "cheese", "olive"] },
-  { order: ["cheese", "pepperoni", "olive", "cheese"] }
+  { order: ["cheese", "pepperoni", "olive", "cheese"] },
+  { order: ["mushroom", "mushroom", "cheese", "cheese"] },
+  { order: ["pepper", "pepper", "pepper", "cheese"] },
+  { order: ["mushroom", "cheese", "pepper", "pepperoni"] }
 ];
 

@@ -18,10 +18,15 @@ const CX = 150, CY = 150, R = 120;
 const TOPPING_COLORS = {
   cheese:    { fill: '#ffd54f', stroke: '#f9a825' },
   olive:     { fill: '#81c784', stroke: '#43a047' },
-  pepperoni: { fill: '#ef5350', stroke: '#c62828' }
+  pepperoni: { fill: '#ef5350', stroke: '#c62828' },
+  mushroom:  { fill: '#e2cba6', stroke: '#b89b6f' },
+  pepper:    { fill: '#9ccc65', stroke: '#689f38' }
 };
-const TOPPING_EMOJI = { cheese: '\u{1F9C0}', olive: '\u{1FAD2}', pepperoni: '\u{1F355}' };
-const TOPPING_NAMES = { cheese: 'Cheese', olive: 'Olive', pepperoni: 'Pepperoni' };
+const TOPPING_EMOJI = { cheese: '\u{1F9C0}', olive: '\u{1FAD2}', pepperoni: '\u{1F355}', mushroom: '\u{1F344}', pepper: '\u{1FAD1}' };
+const TOPPING_NAMES = { cheese: 'Cheese', olive: 'Olive', pepperoni: 'Pepperoni', mushroom: 'Mushroom', pepper: 'Pepper' };
+
+// when set, the engine uses this order instead of levels[currentLevel] (Free Play mode)
+let levelOverride = null;
 
 const SLICE_DECO = [
   [{ x: 195, y: 85 }, { x: 215, y: 115 }, { x: 185, y: 120 }],
@@ -353,10 +358,26 @@ function slicePath(cx, cy, r, sa, ea) {
 
 function drawPizza(svg, toppings, cx, cy, r, decos, isOrder) {
   svg.innerHTML = '';
-  if (!isOrder) svg.appendChild(svgEl('ellipse', { cx, cy: cy+6, rx: r+4, ry: 10, fill: 'rgba(0,0,0,0.06)' }));
-  svg.appendChild(svgEl('circle', { cx, cy, r: r + (isOrder ? 4 : 10), fill: '#d4a056', stroke: '#b8863a', 'stroke-width': isOrder ? 1 : 2.5 }));
-  if (!isOrder) svg.appendChild(svgEl('circle', { cx, cy, r: r+10, fill: 'none', stroke: '#e8be7a', 'stroke-width': 1, opacity: '0.5' }));
-  svg.appendChild(svgEl('circle', { cx, cy, r, fill: '#ffe082', stroke: '#f0c040', 'stroke-width': isOrder ? 0.5 : 1 }));
+  const pid = (svg.id || 'pz');
+
+  // gradients + gloss for a richer, glossier pizza
+  const defs = svgEl('defs');
+  defs.innerHTML =
+    `<radialGradient id="${pid}_crust" cx="50%" cy="40%" r="62%">
+       <stop offset="0%" stop-color="#eabb78"/><stop offset="68%" stop-color="#d8a458"/><stop offset="100%" stop-color="#b07f37"/>
+     </radialGradient>
+     <radialGradient id="${pid}_cheese" cx="46%" cy="38%" r="66%">
+       <stop offset="0%" stop-color="#ffeaa6"/><stop offset="60%" stop-color="#ffd86b"/><stop offset="100%" stop-color="#f4c23e"/>
+     </radialGradient>
+     <radialGradient id="${pid}_gloss" cx="36%" cy="28%" r="48%">
+       <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+     </radialGradient>`;
+  svg.appendChild(defs);
+
+  if (!isOrder) svg.appendChild(svgEl('ellipse', { cx, cy: cy+8, rx: r+6, ry: 12, fill: 'rgba(0,0,0,0.08)' }));
+  svg.appendChild(svgEl('circle', { cx, cy, r: r + (isOrder ? 4 : 10), fill: `url(#${pid}_crust)`, stroke: '#a9762f', 'stroke-width': isOrder ? 1 : 2.5 }));
+  if (!isOrder) svg.appendChild(svgEl('circle', { cx, cy, r: r+10, fill: 'none', stroke: '#f0cf94', 'stroke-width': 1.5, opacity: '0.6' }));
+  svg.appendChild(svgEl('circle', { cx, cy, r, fill: `url(#${pid}_cheese)`, stroke: '#f0c040', 'stroke-width': isOrder ? 0.5 : 1 }));
 
   for (let i = 0; i < 4; i++) {
     const top = toppings[i];
@@ -365,7 +386,7 @@ function drawPizza(svg, toppings, cx, cy, r, decos, isOrder) {
 
     if (top) {
       const col = TOPPING_COLORS[top];
-      g.appendChild(svgEl('path', { d: slicePath(cx,cy,r,sa,ea), fill: col.fill, stroke: col.stroke, 'stroke-width': isOrder ? 0.5 : 1.5, opacity: '0.88' }));
+      g.appendChild(svgEl('path', { d: slicePath(cx,cy,r,sa,ea), fill: col.fill, stroke: col.stroke, 'stroke-width': isOrder ? 0.5 : 1.5, opacity: '0.9' }));
       decos[i].forEach(pos => {
         if (top === 'cheese') {
           g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 3 : 7, fill: '#ffb300', opacity: '0.55' }));
@@ -373,10 +394,19 @@ function drawPizza(svg, toppings, cx, cy, r, decos, isOrder) {
         } else if (top === 'olive') {
           g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 4 : 9, fill: '#2e7d32', stroke: '#1b5e20', 'stroke-width': isOrder ? 0.5 : 1 }));
           g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 1.8 : 4, fill: '#81c784', opacity: '0.45' }));
-        } else {
+        } else if (top === 'pepperoni') {
           g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 4.5 : 10, fill: '#c62828', stroke: '#8e0000', 'stroke-width': isOrder ? 0.5 : 1 }));
           g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 2.5 : 5, fill: '#ef5350', opacity: '0.35' }));
           g.appendChild(svgEl('circle', { cx: pos.x-(isOrder?1:3), cy: pos.y-(isOrder?1:3), r: isOrder ? 1 : 2, fill: '#ff8a80', opacity: '0.4' }));
+        } else if (top === 'mushroom') {
+          // cap + stem
+          g.appendChild(svgEl('ellipse', { cx: pos.x, cy: pos.y-(isOrder?1:2), rx: isOrder ? 4.5 : 10, ry: isOrder ? 3 : 6.5, fill: '#cda87f', stroke: '#9c7b54', 'stroke-width': isOrder ? 0.5 : 1 }));
+          g.appendChild(svgEl('rect', { x: pos.x-(isOrder?1:2), y: pos.y-(isOrder?0.5:1), width: isOrder ? 2 : 4, height: isOrder ? 2.5 : 6, rx: isOrder ? 0.6 : 1.5, fill: '#f1e6d2', stroke: '#cdb79e', 'stroke-width': isOrder ? 0.3 : 0.7 }));
+          g.appendChild(svgEl('circle', { cx: pos.x-(isOrder?1.4:3), cy: pos.y-(isOrder?1.4:3), r: isOrder ? 0.6 : 1.4, fill: '#8a6d4a', opacity: '0.45' }));
+        } else if (top === 'pepper') {
+          // green pepper ring
+          g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 4 : 9.5, fill: 'none', stroke: '#558b2f', 'stroke-width': isOrder ? 2 : 4.5 }));
+          g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 2 : 5, fill: '#c5e1a5', opacity: '0.45' }));
         }
       });
     } else if (!isOrder) {
@@ -400,6 +430,11 @@ function drawPizza(svg, toppings, cx, cy, r, decos, isOrder) {
     const a = SLICE_ANGLES[i][0] * Math.PI / 180;
     svg.appendChild(svgEl('line', { x1: cx, y1: cy, x2: cx+r*Math.cos(a), y2: cy+r*Math.sin(a), stroke: '#c49040', 'stroke-width': isOrder ? 0.8 : 2, opacity: '0.5' }));
   }
+
+  // glossy highlight on top (purely decorative, never blocks taps)
+  const gloss = svgEl('ellipse', { cx: cx - r*0.22, cy: cy - r*0.32, rx: r*0.72, ry: r*0.5, fill: `url(#${pid}_gloss)` });
+  gloss.style.pointerEvents = 'none';
+  svg.appendChild(gloss);
 }
 
 // =============================================
@@ -501,7 +536,7 @@ function onSliceClick(i) {
 function checkPizza() {
   if (!gameActive) return;
   sfxButton();
-  const correct = levels[currentLevel].order.every((t, i) => placedToppings[i] === t);
+  const correct = (levelOverride || levels[currentLevel]).order.every((t, i) => placedToppings[i] === t);
   if (correct) {
     sfxCorrect();
     gameActive = false;
@@ -521,7 +556,7 @@ function checkPizza() {
 // FRACTION QUESTION
 // =============================================
 function showFractionQuestion() {
-  const level = levels[currentLevel];
+  const level = levelOverride || levels[currentLevel];
   questionAttempts = 0;
   const counts = {};
   level.order.forEach(t => { counts[t] = (counts[t] || 0) + 1; });
@@ -543,6 +578,9 @@ function showFractionQuestion() {
     btn.addEventListener('click', () => handleAnswer(btn, frac, correctFrac));
     c.appendChild(btn);
   });
+
+  // Education hook: fraction bar, voice narration, store for fun-fact
+  if (typeof onQuestionShown === 'function') onQuestionShown(ask, counts[ask], 4, correctFrac);
 
   // Pause music during question
   stopMusic();
@@ -641,7 +679,7 @@ function spawnFlyingStars(count) {
 // =============================================
 function loadLevel(idx) {
   currentLevel = idx;
-  const level = levels[idx];
+  const level = levelOverride || levels[idx];
   selectedTopping = null;
   placedToppings = [null,null,null,null];
   gameActive = true;

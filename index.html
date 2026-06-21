@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Fraction Pieces</title>
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=7">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -22,7 +22,11 @@
   <button id="playButton" onclick="startGame()">PLAY</button>
   <button id="howToPlayBtn" onclick="showHowToPlay()">? How to Play</button>
   <button id="shopBtnOverlay" onclick="showShop()">Pizza Shop</button>
-  <button id="settingsBtnOverlay" onclick="showSettings()" title="Settings">&#9881;</button>
+  <div id="startTopBtns">
+    <button class="round-btn" onclick="showMap()" title="Levels">&#128506;</button>
+    <button class="round-btn" onclick="showAchievements()" title="Badges">&#127942;</button>
+    <button class="round-btn" onclick="showSettings()" title="Settings">&#9881;</button>
+  </div>
 </div>
 
 <!-- ========== HOW TO PLAY ========== -->
@@ -56,6 +60,8 @@
 
   <!-- Sound controls -->
   <div id="soundControls">
+    <button id="mapBtn" onclick="showMap()" class="sound-btn on" title="Levels">&#128506;</button>
+    <span id="endlessBadge">&#9854; <span id="servedCount">0</span></span>
     <button id="musicBtn" onclick="toggleMusic()" class="sound-btn on" title="Music">&#9834;</button>
     <button id="sfxBtn" onclick="toggleSfx()" class="sound-btn on" title="Sounds">&#128264;</button>
   </div>
@@ -80,6 +86,7 @@
 
   <!-- Pizza area -->
   <div id="pizzaArea">
+    <div id="steam"><span></span><span></span><span></span></div>
     <div id="pizzaPlate"></div>
     <svg id="mainPizza" viewBox="0 0 300 300" width="260" height="260"></svg>
     <div id="sliceNumbers"></div>
@@ -107,6 +114,7 @@
     <div id="questionPizzaWrap">
       <svg id="questionPizza" viewBox="0 0 200 200" width="140" height="140"></svg>
     </div>
+    <div id="fractionBar"></div>
     <div id="answerChoices"></div>
   </div>
 </div>
@@ -118,6 +126,7 @@
     <div id="celebStars"></div>
     <h2 id="celebText"></h2>
     <p id="celebSub"></p>
+    <div id="funFact"></div>
     <button id="nextBtn" onclick="nextLevel()">Next Level &#10148;</button>
   </div>
   <div id="confettiContainer"></div>
@@ -207,6 +216,10 @@
       <span>&#128264; Sound effects</span>
       <button id="setSfxToggle" class="pill-toggle" onclick="settingsToggleSfx()">On</button>
     </div>
+    <div class="setting-row">
+      <span>&#128483; Read aloud</span>
+      <button id="setVoiceToggle" class="pill-toggle" onclick="settingsToggleVoice()">On</button>
+    </div>
     <div class="setting-row col">
       <span>&#9728; Brightness</span>
       <input id="brightnessSlider" type="range" min="40" max="100" value="100" oninput="onBrightnessChange(this.value)">
@@ -218,9 +231,37 @@
   </div>
 </div>
 
-<script src="levels.js?v=6"></script>
-<script src="game.js?v=6"></script>
-<script src="shop.js?v=6"></script>
+<!-- ========== LEVEL MAP ========== -->
+<div id="mapOverlay" class="overlay hidden">
+  <div class="card map-card">
+    <div class="shop-topbar">
+      <button class="ghost-btn shop-back" onclick="hideMap()">&#8249; Back</button>
+      <div class="wallet-badge"><span class="star-icon">&#9733;</span> <span id="mapWallet">0</span></div>
+    </div>
+    <h2>&#128506; Pizza Journey</h2>
+    <div id="mapPath"></div>
+    <button id="freePlayBtn" onclick="startEndless()">&#9854; Free Play (endless!)</button>
+  </div>
+</div>
+
+<!-- ========== ACHIEVEMENTS ========== -->
+<div id="achOverlay" class="overlay hidden">
+  <div class="card ach-card">
+    <div class="card-emoji">&#127942;</div>
+    <h2>My Badges</h2>
+    <p id="achProgress"></p>
+    <div id="achGrid"></div>
+    <button onclick="hideAchievements()">Done</button>
+  </div>
+</div>
+
+<!-- generic reward toast (shared) -->
+<div id="achToast"></div>
+
+<script src="levels.js?v=7"></script>
+<script src="game.js?v=7"></script>
+<script src="shop.js?v=7"></script>
+<script src="extras.js?v=7"></script>
 </body>
 </html>
 
