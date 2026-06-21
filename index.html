@@ -13,11 +13,16 @@
 <!-- Floating BG -->
 <div id="floatingBg"></div>
 
+<!-- Brightness overlay -->
+<div id="brightnessOverlay"></div>
+
 <!-- ========== START SCREEN ========== -->
 <div id="startScreen">
-  <img src="assets/start-screen.png" class="startImage" alt="Fraction Pieces">
+  <img src="assets/start-screen.jpg" class="startImage" alt="Fraction Pieces">
   <button id="playButton" onclick="startGame()">PLAY</button>
   <button id="howToPlayBtn" onclick="showHowToPlay()">? How to Play</button>
+  <button id="shopBtnOverlay" onclick="showShop()">Pizza Shop</button>
+  <button id="settingsBtnOverlay" onclick="showSettings()" title="Settings">&#9881;</button>
 </div>
 
 <!-- ========== HOW TO PLAY ========== -->
@@ -35,6 +40,12 @@
 
 <!-- ========== GAME SCREEN ========== -->
 <div id="gameScreen">
+
+  <!-- Shop header -->
+  <div id="shopHeader">
+    <span id="shopHeaderMascot">&#127829;</span>
+    <span id="shopHeaderName">My Pizza Shop</span>
+  </div>
 
   <!-- Top bar -->
   <div id="topBar">
@@ -122,8 +133,79 @@
   <div id="confettiContainer2"></div>
 </div>
 
+<!-- ========== MY PIZZA SHOP ========== -->
+<div id="shopOverlay" class="overlay hidden">
+  <div class="card shop-card">
+    <div class="card-emoji">&#127829;</div>
+    <h2>My Pizza Shop</h2>
+
+    <div class="shop-field">
+      <label>Shop name</label>
+      <input id="shopNameInput" type="text" maxlength="22" placeholder="Lina's Pizzeria" autocomplete="off">
+    </div>
+
+    <div class="shop-field">
+      <label>Sign color</label>
+      <div id="shopThemeSwatches" class="swatch-row"></div>
+    </div>
+
+    <div class="shop-field">
+      <label>Logo / Mascot</label>
+      <div id="shopMascotChoices" class="emoji-row"></div>
+    </div>
+
+    <div class="shop-field">
+      <label>Awning color</label>
+      <div id="shopAwningSwatches" class="swatch-row"></div>
+    </div>
+
+    <div class="shop-field">
+      <label>Background</label>
+      <div id="shopBgChoices" class="bg-row"></div>
+    </div>
+
+    <!-- Live preview -->
+    <div id="shopPreview">
+      <div id="shopPreviewAwning"></div>
+      <div id="shopPreviewSign">
+        <span id="shopPreviewMascot">&#127829;</span>
+        <span id="shopPreviewName">My Pizza Shop</span>
+      </div>
+    </div>
+
+    <button onclick="saveShop()">Save my shop! &#10003;</button>
+    <button class="ghost-btn" onclick="hideShop()">Back</button>
+  </div>
+</div>
+
+<!-- ========== SETTINGS ========== -->
+<div id="settingsOverlay" class="overlay hidden">
+  <div class="card settings-card">
+    <div class="card-emoji">&#9881;</div>
+    <h2>Settings</h2>
+
+    <div class="setting-row">
+      <span>&#9834; Music</span>
+      <button id="setMusicToggle" class="pill-toggle" onclick="settingsToggleMusic()">On</button>
+    </div>
+    <div class="setting-row">
+      <span>&#128264; Sound effects</span>
+      <button id="setSfxToggle" class="pill-toggle" onclick="settingsToggleSfx()">On</button>
+    </div>
+    <div class="setting-row col">
+      <span>&#9728; Brightness</span>
+      <input id="brightnessSlider" type="range" min="40" max="100" value="100" oninput="onBrightnessChange(this.value)">
+    </div>
+
+    <button class="danger-btn" onclick="resetProgressBtn()">&#8634; Reset progress</button>
+    <button class="danger-btn" onclick="resetShopBtn()">&#128465; Reset shop</button>
+    <button onclick="hideSettings()">Done</button>
+  </div>
+</div>
+
 <script src="levels.js"></script>
 <script src="game.js"></script>
+<script src="shop.js"></script>
 </body>
 </html>
 
