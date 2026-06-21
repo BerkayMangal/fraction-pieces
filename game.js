@@ -28,25 +28,27 @@ const TOPPING_NAMES = { cheese: 'Cheese', olive: 'Olive', pepperoni: 'Pepperoni'
 // when set, the engine uses this order instead of levels[currentLevel] (Free Play mode)
 let levelOverride = null;
 
-const SLICE_DECO = [
-  [{ x: 195, y: 85 }, { x: 215, y: 115 }, { x: 185, y: 120 }],
-  [{ x: 195, y: 195 }, { x: 220, y: 215 }, { x: 190, y: 230 }],
-  [{ x: 105, y: 195 }, { x: 80, y: 215 }, { x: 110, y: 230 }],
-  [{ x: 105, y: 85 }, { x: 80, y: 115 }, { x: 115, y: 120 }]
-];
-const ORDER_DECO = [
-  [{ x: 78, y: 35 }, { x: 85, y: 48 }],
-  [{ x: 78, y: 75 }, { x: 88, y: 85 }],
-  [{ x: 42, y: 75 }, { x: 32, y: 85 }],
-  [{ x: 42, y: 35 }, { x: 35, y: 48 }]
-];
-const Q_DECO = [
-  [{ x: 130, y: 56 }, { x: 143, y: 76 }, { x: 123, y: 80 }],
-  [{ x: 130, y: 130 }, { x: 147, y: 143 }, { x: 127, y: 153 }],
-  [{ x: 70, y: 130 }, { x: 53, y: 143 }, { x: 73, y: 153 }],
-  [{ x: 70, y: 56 }, { x: 53, y: 76 }, { x: 77, y: 80 }]
-];
-const SLICE_ANGLES = [[-90, 0], [0, 90], [90, 180], [180, 270]];
+// current denominator (number of slices) — set per level/order
+let DENOM = 4;
+
+// slice angle ranges for an n-slice pizza (first slice starts at the top-right)
+function sliceAngles(n) {
+  const arr = [], step = 360 / n;
+  for (let i = 0; i < n; i++) { const s = -90 + i * step; arr.push([s, s + step]); }
+  return arr;
+}
+
+// decoration positions inside one slice, computed from its mid-angle (works for any n)
+function decoFor(cx, cy, r, sa, ea, isOrder) {
+  const mid = (sa + ea) / 2 * Math.PI / 180;
+  const spread = (ea - sa) * Math.PI / 180;
+  const n = (ea - sa) <= 46 ? 1 : (ea - sa) <= 70 ? 2 : 3; // fewer dots on thin slices
+  const pts = [{ rr: 0.56, off: 0 }, { rr: 0.74, off: -0.22 }, { rr: 0.42, off: 0.22 }].slice(0, n);
+  return pts.map(p => ({
+    x: cx + r * p.rr * Math.cos(mid + spread * p.off),
+    y: cy + r * p.rr * Math.sin(mid + spread * p.off)
+  }));
+}
 
 const CHEF_MESSAGES = {
   start: ["Let's make a yummy pizza! \u{1F355}","New order! \u{1F4CB}","Pizza time! \u{1F60B}","Ready to cook? \u{1F468}\u{200D}\u{1F373}"],
@@ -356,7 +358,7 @@ function slicePath(cx, cy, r, sa, ea) {
   return `M${cx},${cy} L${cx+r*Math.cos(s)},${cy+r*Math.sin(s)} A${r},${r} 0 0,1 ${cx+r*Math.cos(e)},${cy+r*Math.sin(e)} Z`;
 }
 
-function drawPizza(svg, toppings, cx, cy, r, decos, isOrder) {
+function drawPizza(svg, toppings, cx, cy, r, isOrder) {
   svg.innerHTML = '';
   const pid = (svg.id || 'pz');
 
@@ -379,15 +381,17 @@ function drawPizza(svg, toppings, cx, cy, r, decos, isOrder) {
   if (!isOrder) svg.appendChild(svgEl('circle', { cx, cy, r: r+10, fill: 'none', stroke: '#f0cf94', 'stroke-width': 1.5, opacity: '0.6' }));
   svg.appendChild(svgEl('circle', { cx, cy, r, fill: `url(#${pid}_cheese)`, stroke: '#f0c040', 'stroke-width': isOrder ? 0.5 : 1 }));
 
-  for (let i = 0; i < 4; i++) {
+  const n = toppings.length;
+  const angles = sliceAngles(n);
+  for (let i = 0; i < n; i++) {
     const top = toppings[i];
-    const [sa, ea] = SLICE_ANGLES[i];
+    const [sa, ea] = angles[i];
     const g = svgEl('g');
 
     if (top) {
       const col = TOPPING_COLORS[top];
       g.appendChild(svgEl('path', { d: slicePath(cx,cy,r,sa,ea), fill: col.fill, stroke: col.stroke, 'stroke-width': isOrder ? 0.5 : 1.5, opacity: '0.9' }));
-      decos[i].forEach(pos => {
+      decoFor(cx, cy, r, sa, ea, isOrder).forEach(pos => {
         if (top === 'cheese') {
           g.appendChild(svgEl('circle', { cx: pos.x, cy: pos.y, r: isOrder ? 3 : 7, fill: '#ffb300', opacity: '0.55' }));
           g.appendChild(svgEl('circle', { cx: pos.x-(isOrder?1:2), cy: pos.y-(isOrder?1:2), r: isOrder ? 1.5 : 3.5, fill: '#fff3c4', opacity: '0.7' }));
@@ -412,7 +416,8 @@ function drawPizza(svg, toppings, cx, cy, r, decos, isOrder) {
     } else if (!isOrder) {
       g.appendChild(svgEl('path', { d: slicePath(cx,cy,r,sa,ea), fill: '#ffe8b0', stroke: '#e0c878', 'stroke-width': 1.5, 'stroke-dasharray': '8 5', opacity: '0.6' }));
       const mid = (sa+ea)/2 * Math.PI / 180;
-      const txt = svgEl('text', { x: cx+r*0.55*Math.cos(mid), y: cy+r*0.55*Math.sin(mid)+5, 'text-anchor': 'middle', 'font-size': '22', 'font-family': 'Fredoka,sans-serif', fill: '#d4b080', opacity: '0.6', 'font-weight': '600' });
+      const fs = Math.max(12, r * 0.18);
+      const txt = svgEl('text', { x: cx+r*0.55*Math.cos(mid), y: cy+r*0.55*Math.sin(mid)+fs*0.34, 'text-anchor': 'middle', 'font-size': fs, 'font-family': 'Fredoka,sans-serif', fill: '#d4b080', opacity: '0.6', 'font-weight': '600' });
       txt.textContent = '?';
       g.appendChild(txt);
     }
@@ -426,8 +431,8 @@ function drawPizza(svg, toppings, cx, cy, r, decos, isOrder) {
   }
 
   svg.appendChild(svgEl('circle', { cx, cy, r: isOrder ? 3 : 7, fill: '#d4a056', stroke: '#b8863a', 'stroke-width': isOrder ? 0.5 : 1.5 }));
-  for (let i = 0; i < 4; i++) {
-    const a = SLICE_ANGLES[i][0] * Math.PI / 180;
+  for (let i = 0; i < n; i++) {
+    const a = angles[i][0] * Math.PI / 180;
     svg.appendChild(svgEl('line', { x1: cx, y1: cy, x2: cx+r*Math.cos(a), y2: cy+r*Math.sin(a), stroke: '#c49040', 'stroke-width': isOrder ? 0.8 : 2, opacity: '0.5' }));
   }
 
@@ -453,13 +458,16 @@ function updateProgressDots() {
 function updateSliceNumbers() {
   const c = $('sliceNumbers');
   c.innerHTML = '';
-  const pos = [{top:'18%',left:'62%'},{top:'62%',left:'62%'},{top:'62%',left:'18%'},{top:'18%',left:'18%'}];
-  for (let i = 0; i < 4; i++) {
+  const angles = sliceAngles(DENOM);
+  const rad = DENOM >= 6 ? 36 : 32; // push numbers out a touch on busy pizzas
+  for (let i = 0; i < DENOM; i++) {
+    const mid = (angles[i][0] + angles[i][1]) / 2 * Math.PI / 180;
     const n = document.createElement('div');
     n.className = 'slice-num';
     n.textContent = i + 1;
-    n.style.top = pos[i].top;
-    n.style.left = pos[i].left;
+    n.style.left = (50 + rad * Math.cos(mid)) + '%';
+    n.style.top = (50 + rad * Math.sin(mid)) + '%';
+    n.style.transform = 'translate(-50%,-50%)';
     c.appendChild(n);
   }
 }
@@ -510,7 +518,7 @@ function onSliceClick(i) {
   if (placedToppings[i] !== null) { placedToppings[i] = null; }
   else { placedToppings[i] = selectedTopping; sfxPlace(); chefSay('placed'); }
 
-  drawPizza($('mainPizza'), placedToppings, CX, CY, R, SLICE_DECO, false);
+  drawPizza($('mainPizza'), placedToppings, CX, CY, R, false);
 
   document.querySelectorAll('.pizza-slice').forEach(el => {
     const idx = parseInt(el.dataset.slice);
@@ -558,20 +566,30 @@ function checkPizza() {
 function showFractionQuestion() {
   const level = levelOverride || levels[currentLevel];
   questionAttempts = 0;
+  const d = level.order.length;
   const counts = {};
   level.order.forEach(t => { counts[t] = (counts[t] || 0) + 1; });
   const toppings = Object.keys(counts);
-  const interesting = toppings.filter(t => counts[t] !== 4);
+  const interesting = toppings.filter(t => counts[t] !== d);
   const ask = interesting.length > 0 ? randomFrom(interesting) : toppings[0];
-  const correctFrac = `${counts[ask]}/4`;
+  const correctFrac = `${counts[ask]}/${d}`;
 
   $('questionText').textContent = `What fraction is ${TOPPING_NAMES[ask]}?`;
   $('questionEmoji').textContent = TOPPING_EMOJI[ask];
-  drawPizza($('questionPizza'), level.order, 100, 100, 80, Q_DECO, true);
+  drawPizza($('questionPizza'), level.order, 100, 100, 80, true);
+
+  // build up to 4 answer choices: always the correct one + nearby distractors
+  const opts = new Set([correctFrac]);
+  const correctN = counts[ask];
+  [correctN - 1, correctN + 1, correctN + 2, correctN - 2, d].forEach(v => {
+    if (opts.size < 4 && v >= 1 && v <= d) opts.add(`${v}/${d}`);
+  });
+  let cand = 1;
+  while (opts.size < 4 && cand <= d) { opts.add(`${cand}/${d}`); cand++; }
 
   const c = $('answerChoices');
   c.innerHTML = '';
-  ['1/4','2/4','3/4','4/4'].sort(() => Math.random()-0.5).forEach(frac => {
+  [...opts].sort(() => Math.random()-0.5).forEach(frac => {
     const btn = document.createElement('button');
     btn.className = 'answer-btn';
     btn.textContent = frac;
@@ -580,7 +598,7 @@ function showFractionQuestion() {
   });
 
   // Education hook: fraction bar, voice narration, store for fun-fact
-  if (typeof onQuestionShown === 'function') onQuestionShown(ask, counts[ask], 4, correctFrac);
+  if (typeof onQuestionShown === 'function') onQuestionShown(ask, counts[ask], d, correctFrac);
 
   // Pause music during question
   stopMusic();
@@ -680,15 +698,16 @@ function spawnFlyingStars(count) {
 function loadLevel(idx) {
   currentLevel = idx;
   const level = levelOverride || levels[idx];
+  DENOM = level.order.length;
   selectedTopping = null;
-  placedToppings = [null,null,null,null];
+  placedToppings = new Array(DENOM).fill(null);
   gameActive = true;
   $('levelNum').textContent = idx + 1;
   $('totalStars').textContent = totalStars;
   $('checkBtn').classList.remove('visible');
   updateProgressDots();
   updateSliceNumbers();
-  drawPizza($('orderPizza'), level.order, 60, 60, 46, ORDER_DECO, true);
+  drawPizza($('orderPizza'), level.order, 60, 60, 46, true);
 
   const counts = {};
   level.order.forEach(t => { counts[t] = (counts[t]||0)+1; });
@@ -697,12 +716,12 @@ function loadLevel(idx) {
   Object.entries(counts).forEach(([top, count], i) => {
     const tag = document.createElement('span');
     tag.className = `order-tag ${top}`;
-    tag.textContent = `${TOPPING_EMOJI[top]} ${count}/4`;
+    tag.textContent = `${TOPPING_EMOJI[top]} ${count}/${DENOM}`;
     tag.style.animationDelay = (i*0.1)+'s';
     fc.appendChild(tag);
   });
 
-  drawPizza($('mainPizza'), placedToppings, CX, CY, R, SLICE_DECO, false);
+  drawPizza($('mainPizza'), placedToppings, CX, CY, R, false);
   buildToppingBar(level.order);
   chefSay('start');
   $('toppingTitle').textContent = 'Pick a topping!';
@@ -767,10 +786,10 @@ function restartGame() {
 function resetPizza() {
   if (!gameActive) return;
   sfxSelect();
-  placedToppings = [null,null,null,null];
+  placedToppings = new Array(DENOM).fill(null);
   selectedTopping = null;
   document.querySelectorAll('.topping-btn').forEach(b => b.classList.remove('selected'));
-  drawPizza($('mainPizza'), placedToppings, CX, CY, R, SLICE_DECO, false);
+  drawPizza($('mainPizza'), placedToppings, CX, CY, R, false);
   $('checkBtn').classList.remove('visible');
   $('toppingTitle').textContent = 'Pick a topping!';
   chefSay('start');

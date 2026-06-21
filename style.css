@@ -576,6 +576,26 @@ body{
 #achToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 #achToast .at-ic{font-size:30px}
 
+/* ===== DAILY REWARD ===== */
+.daily-card{text-align:center;max-width:340px}
+#dailyStreak{font-size:18px;font-weight:700;color:#ff6b35;margin-bottom:6px}
+#dailyStars{font-size:30px;margin:6px 0;animation:starsAppear 0.6s 0.2s cubic-bezier(0.34,1.56,0.64,1) both}
+#dailyBonus{font-size:15px;color:#8b7355;margin-bottom:18px;font-weight:600}
+
+/* ===== ADD PIZZAS MINI-GAME ===== */
+.add-card{max-width:380px;text-align:center}
+.add-card h2{margin-bottom:14px}
+#addRow{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;flex-wrap:nowrap}
+#addPizzaA,#addPizzaB{filter:drop-shadow(0 3px 6px rgba(0,0,0,0.12))}
+.add-op{font-size:30px;font-weight:700;color:#ff8c00}
+.add-q{font-size:34px;font-weight:700;color:#5a4a3a;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;background:#fff3d6;border-radius:12px;border:2px dashed #e0c080}
+#addPrompt{font-size:22px;font-weight:700;color:#5a4a3a;margin-bottom:14px;font-family:'Fredoka',sans-serif}
+#addChoices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#addGameBtn{
+  background:linear-gradient(180deg,#4dd0e1,#26a0b3)!important;
+  box-shadow:0 4px 0 #00838f,0 6px 16px rgba(0,0,0,0.15)!important;
+}
+
 /* ===== RESPONSIVE ===== */
 @media(min-width:500px){#gameScreen{max-width:440px;margin:0 auto;min-height:100vh}}
 @media(max-height:680px){

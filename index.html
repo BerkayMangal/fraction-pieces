@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Fraction Pieces</title>
+<meta name="theme-color" content="#ff8c00">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fractions">
 <link rel="stylesheet" href="style.css?v=7">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -241,6 +248,39 @@
     <h2>&#128506; Pizza Journey</h2>
     <div id="mapPath"></div>
     <button id="freePlayBtn" onclick="startEndless()">&#9854; Free Play (endless!)</button>
+    <button id="addGameBtn" onclick="startAddGame()">&#10133; Add Pizzas! (mini-game)</button>
+  </div>
+</div>
+
+<!-- ========== DAILY REWARD ========== -->
+<div id="dailyOverlay" class="overlay hidden">
+  <div class="card daily-card">
+    <div class="card-emoji">&#127873;</div>
+    <h2>Daily Reward!</h2>
+    <p id="dailyStreak"></p>
+    <div id="dailyStars"></div>
+    <p id="dailyBonus"></p>
+    <button onclick="claimDaily()">Yay! Collect &#11088;</button>
+  </div>
+</div>
+
+<!-- ========== ADD PIZZAS MINI-GAME ========== -->
+<div id="addOverlay" class="overlay hidden">
+  <div class="card add-card">
+    <div class="shop-topbar">
+      <button class="ghost-btn shop-back" onclick="hideAddGame()">&#8249; Back</button>
+      <div class="wallet-badge"><span class="star-icon">&#9733;</span> <span id="addWallet">0</span></div>
+    </div>
+    <h2>&#10133; Add the Pizzas!</h2>
+    <div id="addRow">
+      <svg id="addPizzaA" viewBox="0 0 160 160" width="92" height="92"></svg>
+      <span class="add-op">+</span>
+      <svg id="addPizzaB" viewBox="0 0 160 160" width="92" height="92"></svg>
+      <span class="add-op">=</span>
+      <span class="add-q">?</span>
+    </div>
+    <div id="addPrompt"></div>
+    <div id="addChoices"></div>
   </div>
 </div>
 
@@ -262,6 +302,13 @@
 <script src="game.js?v=7"></script>
 <script src="shop.js?v=7"></script>
 <script src="extras.js?v=7"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js?v=7').catch(function () {});
+  });
+}
+</script>
 </body>
 </html>
 

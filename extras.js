@@ -59,10 +59,12 @@ function renderFractionBar(count, denom) {
   bar.innerHTML = '';
   const track = document.createElement('div');
   track.className = 'frac-track';
+  const w = Math.max(14, Math.min(40, Math.floor(300 / denom))); // responsive segment width
   for (let i = 0; i < denom; i++) {
     const seg = document.createElement('div');
     seg.className = 'frac-seg' + (i < count ? ' fill' : '');
-    seg.style.animationDelay = (i * 0.08) + 's';
+    seg.style.width = w + 'px';
+    seg.style.animationDelay = (i * 0.06) + 's';
     track.appendChild(seg);
   }
   bar.appendChild(track);
@@ -75,12 +77,22 @@ function onQuestionShown(ask, count, denom, frac) {
   speak('What fraction is ' + (TOPPING_NAMES[ask] || ask) + '?');
 }
 
-const FUN_FACTS = {
-  '1/4': { t: '1 out of 4 slices — that’s one quarter!', say: 'One quarter. One out of four.' },
-  '2/4': { t: '2/4 is the same as 1/2 — a half! \u{1F355}', say: 'Two fourths is the same as one half!' },
-  '3/4': { t: '3 out of 4 — three quarters, almost the whole pizza!', say: 'Three quarters. Almost the whole pizza!' },
-  '4/4': { t: '4/4 makes 1 WHOLE pizza! \u{1F389}', say: 'Four fourths makes one whole pizza!' }
-};
+// say a fraction in kid words: 2/4 -> "two quarters", 1/2 -> "one half"
+const ORD = { 2: ['half', 'halves'], 3: ['third', 'thirds'], 4: ['quarter', 'quarters'], 6: ['sixth', 'sixths'], 8: ['eighth', 'eighths'] };
+function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+function sayFrac(n, d) { const o = ORD[d]; if (!o) return n + ' over ' + d; return n + ' ' + (n === 1 ? o[0] : o[1]); }
+
+function funFactFor(frac) {
+  const parts = frac.split('/').map(Number), n = parts[0], d = parts[1];
+  if (n === d) return { t: n + '/' + d + ' makes 1 WHOLE pizza! \u{1F389}', say: n + ' ' + (ORD[d] ? ORD[d][1] : 'parts') + ' makes one whole pizza!' };
+  const g = gcd(n, d);
+  if (g > 1) {
+    const sn = n / g, sd = d / g;
+    const simple = sd === 1 ? 'a whole' : sn + '/' + sd;
+    return { t: n + '/' + d + ' is the same as ' + simple + '! \u{1F355}', say: sayFrac(n, d) + ' is the same as ' + (sd === 1 ? 'one whole' : sayFrac(sn, sd)) };
+  }
+  return { t: n + ' out of ' + d + ' slices — that’s ' + sayFrac(n, d) + '!', say: sayFrac(n, d) };
+}
 
 // =============================================
 // ACHIEVEMENTS / BADGES
@@ -210,11 +222,13 @@ function beginLevel(idx) {
 // FREE PLAY (ENDLESS)
 // =============================================
 function genOrder() {
+  const denoms = [2, 3, 4, 4, 6, 8]; // mixed slice counts (4 weighted)
+  const d = denoms[Math.floor(Math.random() * denoms.length)];
   const p = ENDLESS_POOL.slice().sort(() => Math.random() - 0.5);
   const a = p[0], b = p[1];
-  const na = 1 + Math.floor(Math.random() * 3); // 1..3 of topping A
+  const na = 1 + Math.floor(Math.random() * (d - 1)); // 1..d-1 of topping A
   const arr = [];
-  for (let i = 0; i < 4; i++) arr.push(i < na ? a : b);
+  for (let i = 0; i < d; i++) arr.push(i < na ? a : b);
   return arr.sort(() => Math.random() - 0.5);
 }
 function startEndless() {
@@ -269,7 +283,7 @@ showCelebration = function (stars) {
     recordLevelStar(currentLevel, stars);
   }
   // fun fact + voice
-  const f = FUN_FACTS[lastFrac];
+  const f = funFactFor(lastFrac);
   const ff = document.getElementById('funFact');
   if (ff) ff.textContent = f ? f.t : '';
   if (f) setTimeout(() => speak(f.say), 750);
@@ -306,6 +320,122 @@ afterShopChange = function () {
   checkAchievements();
 };
 
+// =============================================
+// CUSTOMERS (named characters + varied lines)
+// =============================================
+const CUST_ROSTER = [
+  { e: '\u{1F430}', n: 'Rosie' }, { e: '\u{1F436}', n: 'Max' }, { e: '\u{1F431}', n: 'Mimi' },
+  { e: '\u{1F43C}', n: 'Bao' }, { e: '\u{1F98A}', n: 'Foxy' }, { e: '\u{1F435}', n: 'Coco' },
+  { e: '\u{1F42F}', n: 'Tiger' }, { e: '\u{1F438}', n: 'Hops' }, { e: '\u{1F981}', n: 'Leo' },
+  { e: '\u{1F427}', n: 'Pip' }, { e: '\u{1F428}', n: 'Ko' }, { e: '\u{1F984}', n: 'Sparkle' }
+];
+const CUST_LINES = ['wants this pizza!', 'is so hungry!', 'loves this one!', 'can’t wait!', 'ordered this!', 'says yum!'];
+renderCustomer = function (idx) {
+  const c = CUST_ROSTER[idx % CUST_ROSTER.length];
+  const face = document.getElementById('orderCustomer');
+  const sp = document.getElementById('orderSpeech');
+  if (face) face.textContent = c.e;
+  if (sp) sp.textContent = c.n + ' ' + CUST_LINES[idx % CUST_LINES.length];
+};
+
+// =============================================
+// DAILY REWARD (streak)
+// =============================================
+const LS_DAILY = 'fp_daily';
+let pendingDaily = null;
+function dateStr(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+function checkDaily() {
+  let data = null;
+  try { data = JSON.parse(localStorage.getItem(LS_DAILY)); } catch (e) {}
+  const today = new Date(), ts = dateStr(today);
+  if (data && data.last === ts) return; // already claimed today
+  const y = new Date(today); y.setDate(today.getDate() - 1);
+  const ys = dateStr(y);
+  let streak = 1;
+  if (data && data.last === ys) streak = (data.streak || 1) + 1;
+  pendingDaily = { streak: streak, bonus: Math.min(2 + streak, 10), ts: ts };
+  document.getElementById('dailyStreak').textContent = 'Day ' + streak + ' streak! \u{1F525}';
+  document.getElementById('dailyBonus').textContent = '+' + pendingDaily.bonus + ' stars for your shop!';
+  document.getElementById('dailyStars').textContent = '⭐'.repeat(Math.min(pendingDaily.bonus, 8));
+  const ov = document.getElementById('dailyOverlay');
+  ov.classList.remove('hidden'); ov.classList.add('fade-in');
+}
+function claimDaily() {
+  if (typeof ensureAudio === 'function') ensureAudio();
+  if (pendingDaily) {
+    awardStars(pendingDaily.bonus);
+    try { localStorage.setItem(LS_DAILY, JSON.stringify({ last: pendingDaily.ts, streak: pendingDaily.streak })); } catch (e) {}
+    if (typeof sfxCelebrate === 'function') sfxCelebrate();
+    pendingDaily = null;
+    checkAchievements();
+  }
+  document.getElementById('dailyOverlay').classList.add('hidden');
+}
+
+// =============================================
+// FRACTION ADDITION MINI-GAME
+// =============================================
+let addState = null;
+function drawAddPizza(svg, count, denom, topping) {
+  const arr = new Array(denom).fill(null);
+  for (let i = 0; i < count; i++) arr[i] = topping;
+  drawPizza(svg, arr, 80, 80, 64, true);
+}
+function genAddRound() {
+  const denom = [4, 4, 6][Math.floor(Math.random() * 3)];
+  const a = 1 + Math.floor(Math.random() * (denom - 1));
+  const b = 1 + Math.floor(Math.random() * (denom - a));
+  addState = { denom: denom, a: a, b: b, sum: a + b, tries: 0 };
+  drawAddPizza(document.getElementById('addPizzaA'), a, denom, 'cheese');
+  drawAddPizza(document.getElementById('addPizzaB'), b, denom, 'pepperoni');
+  document.getElementById('addPrompt').innerHTML = a + '/' + denom + ' + ' + b + '/' + denom + ' = <b>?</b>';
+  setTimeout(() => speak(sayFrac(a, denom) + ' plus ' + sayFrac(b, denom) + '. How many altogether?'), 250);
+  const correct = (a + b) + '/' + denom;
+  const opts = new Set([correct]);
+  [a + b - 1, a + b + 1, a, b].forEach(v => { if (opts.size < 4 && v >= 1 && v <= denom) opts.add(v + '/' + denom); });
+  let c = 1; while (opts.size < 4 && c <= denom) { opts.add(c + '/' + denom); c++; }
+  const box = document.getElementById('addChoices'); box.innerHTML = '';
+  [...opts].sort(() => Math.random() - 0.5).forEach(f => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn'; btn.textContent = f;
+    btn.onclick = () => addAnswer(btn, f, correct);
+    box.appendChild(btn);
+  });
+}
+function addAnswer(btn, chosen, correct) {
+  if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+  addState.tries++;
+  if (typeof sfxButton === 'function') sfxButton();
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    if (typeof sfxCorrect === 'function') sfxCorrect();
+    document.querySelectorAll('#addChoices .answer-btn').forEach(b => b.style.pointerEvents = 'none');
+    const reward = addState.tries === 1 ? 2 : 1;
+    awardStars(reward);
+    document.getElementById('addWallet').textContent = wallet;
+    setTimeout(() => speak(sayFrac(addState.a, addState.denom) + ' plus ' + sayFrac(addState.b, addState.denom) + ' equals ' + sayFrac(addState.sum, addState.denom)), 300);
+    checkAchievements();
+    setTimeout(genAddRound, 1600);
+  } else {
+    btn.classList.add('wrong'); btn.style.pointerEvents = 'none';
+    if (typeof sfxWrong === 'function') sfxWrong();
+  }
+}
+function startAddGame() {
+  if (typeof sfxButton === 'function') sfxButton();
+  if (typeof ensureAudio === 'function') ensureAudio();
+  hideMap();
+  document.getElementById('addWallet').textContent = wallet;
+  genAddRound();
+  const ov = document.getElementById('addOverlay');
+  ov.classList.remove('hidden'); ov.classList.add('fade-in');
+}
+function hideAddGame() {
+  if (typeof sfxButton === 'function') sfxButton();
+  document.getElementById('addOverlay').classList.add('hidden');
+}
+
 // ===== INIT =====
 if (typeof settingsData.voice === 'undefined') { settingsData.voice = true; persistSettings(); }
 checkAchievements(); // grandfather badges for returning players
+checkDaily();        // welcome / daily streak gift
