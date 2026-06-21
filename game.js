@@ -164,8 +164,9 @@ function sfxPlace() {
 function sfxCorrect() {
   if (sfxEnabled && navigator.vibrate) navigator.vibrate([20, 40, 20]);
   if (!sfxEnabled || !audioCtx) return;
-  // Happy ascending arpeggio
-  const notes = [523, 659, 784, 1047];
+  // Happy ascending arpeggio (slight random transpose so it stays fresh)
+  const k = 1 + (Math.random() * 0.12 - 0.04);
+  const notes = [523 * k, 659 * k, 784 * k, 1047 * k];
   notes.forEach((f, i) => {
     setTimeout(() => {
       tone(f, 0.2, 'sine', 0.1);

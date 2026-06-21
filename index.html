@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fractions">
-<link rel="stylesheet" href="style.css?v=12">
+<link rel="stylesheet" href="style.css?v=13">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -30,6 +30,7 @@
   </div>
   <div id="startMenu">
     <button id="playButton" onclick="startGame()">&#9654; PLAY</button>
+    <button class="start-btn c-green big-btn" onclick="showMath()">&#129504; Math Challenge</button>
     <div class="start-row">
       <button class="start-btn c-cyan" onclick="showMap()">&#128506; Levels</button>
       <button class="start-btn c-purple" onclick="showGames()">&#127918; Mini Games</button>
@@ -392,10 +393,50 @@
 <!-- generic reward toast (shared) -->
 <div id="achToast"></div>
 
-<script src="levels.js?v=12"></script>
-<script src="game.js?v=12"></script>
-<script src="shop.js?v=12"></script>
-<script src="extras.js?v=12"></script>
+<!-- ========== MATH CHALLENGE (Kumon-style ladder) ========== -->
+<div id="mathOverlay" class="overlay hidden">
+  <div class="card math-ladder-card">
+    <div class="shop-topbar">
+      <button class="ghost-btn shop-back" onclick="hideMath()">&#8249; Back</button>
+      <div class="wallet-badge"><span class="star-icon">&#9733;</span> <span id="mathWalletL">0</span></div>
+    </div>
+    <h2>&#129504; Math Challenge</h2>
+    <p class="math-sub">Master each step, one at a time!</p>
+    <div id="mathLadder"></div>
+  </div>
+</div>
+
+<div id="mathSessionOverlay" class="overlay hidden">
+  <div class="card math-q-card">
+    <div class="shop-topbar">
+      <button class="ghost-btn shop-back" onclick="quitMath()">&#8249; Quit</button>
+      <div id="mathProgress" class="math-progress"></div>
+    </div>
+    <div id="mathStageTitle"></div>
+    <div id="mathPrompt"></div>
+    <div id="mathVisual"></div>
+    <div id="mathChoices"></div>
+    <div id="mathFeedback"></div>
+  </div>
+</div>
+
+<div id="mathResultOverlay" class="overlay hidden">
+  <div class="card math-result-card">
+    <div class="card-emoji" id="mathResultEmoji">&#127881;</div>
+    <h2 id="mathResultTitle"></h2>
+    <div id="mathResultStars"></div>
+    <p id="mathResultText"></p>
+    <button id="mathNextBtn" onclick="mathNextStage()">Next step &#10148;</button>
+    <button class="ghost-btn" onclick="mathRetry()">Try again</button>
+    <button class="ghost-btn" onclick="backToLadder()">Back to list</button>
+  </div>
+</div>
+
+<script src="levels.js?v=13"></script>
+<script src="game.js?v=13"></script>
+<script src="shop.js?v=13"></script>
+<script src="extras.js?v=13"></script>
+<script src="math.js?v=13"></script>
 <script>
 if ('serviceWorker' in navigator) {
   var fp_refreshing = false;
@@ -403,7 +444,7 @@ if ('serviceWorker' in navigator) {
     if (fp_refreshing) return; fp_refreshing = true; location.reload();
   });
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=12').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=13').catch(function () {});
   });
 }
 </script>

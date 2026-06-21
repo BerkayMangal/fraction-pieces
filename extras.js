@@ -21,7 +21,7 @@ const ENDLESS_POOL = ['cheese', 'olive', 'pepperoni', 'mushroom', 'pepper'];
 // PERSISTENCE
 // =============================================
 function loadStats() {
-  const def = { served: 0, threeStars: 0, campaign: false };
+  const def = { served: 0, threeStars: 0, campaign: false, mathPassed: 0 };
   try { return Object.assign(def, JSON.parse(localStorage.getItem(LS_STATS)) || {}); }
   catch (e) { return def; }
 }
@@ -107,7 +107,9 @@ const ACHS = [
   { id: 'stars100', icon: '\u{1F4AB}', title: 'Star Legend',  desc: 'Earn 100 stars',             test: s => s.lifetime >= 100 },
   { id: 'shopper',  icon: '\u{1F6CD}️', title: 'Shopper',     desc: 'Buy your first shop item',   test: s => s.owned > s.freeCount },
   { id: 'decorator',icon: '\u{1F388}', title: 'Decorator',    desc: 'Place 5 decorations',        test: s => s.decos >= 5 },
-  { id: 'master',   icon: '\u{1F3C6}', title: 'Pizza Master', desc: 'Finish all the levels',      test: s => s.campaign }
+  { id: 'master',   icon: '\u{1F3C6}', title: 'Pizza Master', desc: 'Finish all the levels',      test: s => s.campaign },
+  { id: 'math5',    icon: '\u{1F9E0}', title: 'Math Whiz',    desc: 'Master 5 math steps',        test: s => (s.mathPassed || 0) >= 5 },
+  { id: 'mathAll',  icon: '\u{1F393}', title: 'Brainiac',     desc: 'Master every math step',     test: s => (s.mathPassed || 0) >= 13 }
 ];
 
 function buildStats() {
@@ -116,7 +118,8 @@ function buildStats() {
     SHOP_AWNINGS.filter(x => x.cost === 0).length + SHOP_BGS.filter(x => x.cost === 0).length;
   return {
     served: stats.served, threeStars: stats.threeStars, campaign: stats.campaign,
-    lifetime: lifetime, owned: ownedTotal, freeCount: freeCount, decos: (shopData.decos || []).length
+    lifetime: lifetime, owned: ownedTotal, freeCount: freeCount, decos: (shopData.decos || []).length,
+    mathPassed: stats.mathPassed || 0
   };
 }
 
