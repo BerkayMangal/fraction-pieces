@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fractions">
-<link rel="stylesheet" href="style.css?v=11">
+<link rel="stylesheet" href="style.css?v=12">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -142,6 +142,7 @@
     <div id="celebStars"></div>
     <h2 id="celebText"></h2>
     <p id="celebSub"></p>
+    <div id="celebStory"></div>
     <div id="funFact"></div>
     <button id="nextBtn" onclick="nextLevel()">Next Level &#10148;</button>
   </div>
@@ -182,6 +183,8 @@
       </div>
       <div id="sceneDecos"></div>
     </div>
+
+    <div id="shopRank"></div>
 
     <div class="shop-field">
       <label>&#127991; Shop name</label>
@@ -274,7 +277,22 @@
       <button class="game-card g2" onclick="startAddGame()"><span class="gc-ic">&#10133;</span><span class="gc-txt"><b>Add Pizzas</b><small>Add two fractions together</small></span></button>
       <button class="game-card g3" onclick="startCompare()"><span class="gc-ic">&#9878;</span><span class="gc-txt"><b>Which is Bigger?</b><small>Compare two fractions</small></span></button>
       <button class="game-card g4" onclick="startMatch()"><span class="gc-ic">&#129380;</span><span class="gc-txt"><b>Find the Match</b><small>Find the same amount (equal fractions)</small></span></button>
+      <button class="game-card g5" onclick="startLine()"><span class="gc-ic">&#128207;</span><span class="gc-txt"><b>Number Line</b><small>Find the fraction on the line</small></span></button>
     </div>
+  </div>
+</div>
+
+<!-- ========== NUMBER LINE MINI-GAME ========== -->
+<div id="lineOverlay" class="overlay hidden">
+  <div class="card line-card">
+    <div class="shop-topbar">
+      <button class="ghost-btn shop-back" onclick="hideLine()">&#8249; Back</button>
+      <div class="wallet-badge"><span class="star-icon">&#9733;</span> <span id="lineWallet">0</span></div>
+    </div>
+    <h2>&#128207; Where is the fraction?</h2>
+    <div id="linePrompt"></div>
+    <div id="lineTrack"></div>
+    <div id="lineMsg">Tap the right spot!</div>
   </div>
 </div>
 
@@ -374,10 +392,10 @@
 <!-- generic reward toast (shared) -->
 <div id="achToast"></div>
 
-<script src="levels.js?v=11"></script>
-<script src="game.js?v=11"></script>
-<script src="shop.js?v=11"></script>
-<script src="extras.js?v=11"></script>
+<script src="levels.js?v=12"></script>
+<script src="game.js?v=12"></script>
+<script src="shop.js?v=12"></script>
+<script src="extras.js?v=12"></script>
 <script>
 if ('serviceWorker' in navigator) {
   var fp_refreshing = false;
@@ -385,7 +403,7 @@ if ('serviceWorker' in navigator) {
     if (fp_refreshing) return; fp_refreshing = true; location.reload();
   });
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=11').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=12').catch(function () {});
   });
 }
 </script>

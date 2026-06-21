@@ -722,6 +722,42 @@ body{
 #matchMsg{font-size:16px;font-weight:600;color:#8b7355;min-height:22px}
 #matchMsg.good{color:#2e7d32}
 
+.game-card.g5{background:linear-gradient(135deg,#66bb6a,#43a047);box-shadow:0 4px 0 #2e7d32}
+
+/* ===== NUMBER LINE MINI-GAME ===== */
+.line-card{max-width:380px;text-align:center}
+#linePrompt{font-size:24px;font-weight:700;color:#5a4a3a;margin:6px 0 30px}
+#lineTrack{position:relative;height:58px;margin:0 20px 16px}
+.line-base{position:absolute;top:26px;left:0;right:0;height:9px;border-radius:6px;
+  background:linear-gradient(90deg,#ffd54f,#ff8c00);box-shadow:inset 0 1px 2px rgba(0,0,0,0.15)}
+#lineTrack .line-tick{position:absolute;top:16px;transform:translateX(-50%);width:28px;height:28px;border-radius:50%;
+  border:3px solid #ff8c00;background:#fff;cursor:pointer;padding:0;overflow:visible;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:transform 0.1s}
+#lineTrack .line-tick:active{transform:translateX(-50%) scale(0.85)}
+#lineTrack .line-tick.fixed{width:18px;height:18px;top:21px;background:#ffe0a8;border-color:#cc8f00}
+#lineTrack .line-tick.right{background:#4caf50;border-color:#2e7d32;width:32px;height:32px;top:14px}
+#lineTrack .line-tick.wrong{background:#e53935;border-color:#b71c1c}
+#lineTrack .line-tick::after{display:none}
+.tick-lab{position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:700;color:#2e7d32;white-space:nowrap}
+.line-end{position:absolute;top:40px;font-size:15px;font-weight:700;color:#8b7355}
+.line-end.l0{left:0;transform:translateX(-50%)}
+.line-end.l1{right:0;transform:translateX(50%)}
+#lineMsg{font-size:16px;font-weight:600;color:#8b7355;min-height:22px}
+#lineMsg.good{color:#2e7d32}
+
+/* ===== CELEBRATION STORY BEAT ===== */
+#celebStory{font-size:15px;font-weight:600;color:#ff6b35;margin:-6px 0 12px}
+#celebStory:empty{display:none}
+
+/* ===== SHOP RANK RIBBON ===== */
+#shopRank{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  background:linear-gradient(135deg,#fff3d6,#ffe3a8);color:#7a5200;
+  font-weight:700;font-size:14px;padding:8px;border-radius:14px;margin-bottom:14px;
+  border:2px solid #ffce73;box-shadow:0 2px 6px rgba(0,0,0,0.06);
+}
+#shopRank span{font-size:18px}
+#shopRank:empty{display:none}
+
 /* ===== GENERAL POLISH: consistent scrollable overlay cards ===== */
 .shop-card,.settings-card,.map-card,.ach-card,.games-card,.match-card,.compare-card,.add-card,.parent-card{
   max-height:90dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;

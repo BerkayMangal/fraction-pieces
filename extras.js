@@ -303,13 +303,28 @@ function settingsToggleVoice() {
 // =============================================
 // HOOKS INTO THE GAME (wrap shop.js's already-wrapped versions)
 // =============================================
+const STORY_BEATS = [
+  n => n + ' loved it! \u{1F60B}',
+  () => 'Your shop is getting famous! ⭐',
+  () => 'Another happy customer! \u{1F389}',
+  n => n + ' will tell all their friends!',
+  () => 'Delicious work, chef! \u{1F468}‍\u{1F373}'
+];
+
 const _ext_showCelebration = showCelebration;
 showCelebration = function (stars) {
+  const oldRank = rankFor(stats.served);
   _ext_showCelebration(stars);
+  // story beat
+  const cs = document.getElementById('celebStory');
+  if (cs) { const b = STORY_BEATS[Math.floor(Math.random() * STORY_BEATS.length)]; cs.textContent = b(lastCustomerName); }
   // stats
   stats.served++;
   if (stars === 3) stats.threeStars++;
   persistStats();
+  // shop rank up?
+  const newRank = rankFor(stats.served);
+  if (newRank.name !== oldRank.name) setTimeout(() => rankToast(newRank), 1500);
   if (endless) {
     served++;
     const sc = document.getElementById('servedCount');
@@ -365,13 +380,33 @@ const CUST_ROSTER = [
   { e: '\u{1F427}', n: 'Pip' }, { e: '\u{1F428}', n: 'Ko' }, { e: '\u{1F984}', n: 'Sparkle' }
 ];
 const CUST_LINES = ['wants this pizza!', 'is so hungry!', 'loves this one!', 'can’t wait!', 'ordered this!', 'says yum!'];
+let lastCustomerName = 'Rosie';
 renderCustomer = function (idx) {
   const c = CUST_ROSTER[idx % CUST_ROSTER.length];
+  lastCustomerName = c.n;
   const face = document.getElementById('orderCustomer');
   const sp = document.getElementById('orderSpeech');
   if (face) face.textContent = c.e;
   if (sp) sp.textContent = c.n + ' ' + CUST_LINES[idx % CUST_LINES.length];
 };
+
+// ===== SHOP RANK / FAME (grows with pizzas served) =====
+function rankFor(served) {
+  if (served >= 31) return { name: 'Legendary Pizzeria', icon: '\u{1F3C6}' };
+  if (served >= 16) return { name: 'Famous Pizzeria', icon: '⭐' };
+  if (served >= 8) return { name: 'Busy Pizzeria', icon: '\u{1F468}‍\u{1F373}' };
+  if (served >= 3) return { name: 'Corner Pizzeria', icon: '\u{1F355}' };
+  return { name: 'Food Cart', icon: '\u{1F69A}' };
+}
+function rankToast(r) {
+  const t = document.getElementById('achToast');
+  if (!t) return;
+  t.innerHTML = '<span class="at-ic">' + r.icon + '</span><span><b>Shop leveled up!</b><br>' + r.name + '</span>';
+  t.className = 'show';
+  if (typeof sfxCelebrate === 'function') sfxCelebrate();
+  clearTimeout(achToastTimer);
+  achToastTimer = setTimeout(() => { t.className = ''; }, 2800);
+}
 
 // =============================================
 // DAILY REWARD (streak)
@@ -449,6 +484,7 @@ function addAnswer(btn, chosen, correct) {
     const reward = addState.tries === 1 ? 2 : 1;
     awardStars(reward);
     document.getElementById('addWallet').textContent = wallet;
+    if (typeof spawnConfetti === 'function') spawnConfetti(document.getElementById('confettiContainer'));
     setTimeout(() => speak(sayFrac(addState.a, addState.denom) + ' plus ' + sayFrac(addState.b, addState.denom) + ' equals ' + sayFrac(addState.sum, addState.denom)), 300);
     checkAchievements();
     setTimeout(genAddRound, 1600);
@@ -507,6 +543,7 @@ function comparePick(side) {
     if (typeof sfxCorrect === 'function') sfxCorrect();
     awardStars(1);
     document.getElementById('compareWallet').textContent = wallet;
+    if (typeof spawnConfetti === 'function') spawnConfetti(document.getElementById('confettiContainer'));
     const bn = side === 'A' ? cmpState.n1 + '/' + cmpState.d1 : cmpState.n2 + '/' + cmpState.d2;
     const bd = side === 'A' ? [cmpState.n1, cmpState.d1] : [cmpState.n2, cmpState.d2];
     const msg = document.getElementById('compareMsg');
@@ -549,7 +586,8 @@ function showParent() {
     ['\u{1F5FA} Levels completed', done + ' / ' + levels.length],
     ['\u{1F3C6} Badges earned', achUnlocked.length + ' / ' + ACHS.length],
     ['⭐ Stars earned (total)', lifetime],
-    ['\u{1F525} Best daily streak', (daily.best || daily.streak || 0) + ' days']
+    ['\u{1F525} Best daily streak', (daily.best || daily.streak || 0) + ' days'],
+    ['\u{1F3EA} Shop rank', rankFor(stats.served).icon + ' ' + rankFor(stats.served).name]
   ];
   const box = document.getElementById('parentStats');
   box.innerHTML = '';
@@ -626,6 +664,7 @@ function matchPick(n, d, btn) {
     if (typeof sfxCorrect === 'function') sfxCorrect();
     awardStars(1);
     document.getElementById('matchWallet').textContent = wallet;
+    if (typeof spawnConfetti === 'function') spawnConfetti(document.getElementById('confettiContainer'));
     const t = matchState.target;
     const msg = document.getElementById('matchMsg');
     msg.textContent = t[0] + '/' + t[1] + ' = ' + n + '/' + d + '! ⭐'; msg.className = 'good';
@@ -651,6 +690,77 @@ function hideMatch() {
   if (typeof sfxButton === 'function') sfxButton();
   document.getElementById('matchOverlay').classList.add('hidden');
 }
+
+// =============================================
+// NUMBER LINE MINI-GAME
+// =============================================
+let lineState = null;
+const LINE_DENOMS = [2, 3, 4, 5, 6, 8];
+function genLine() {
+  const d = LINE_DENOMS[Math.floor(Math.random() * LINE_DENOMS.length)];
+  const n = 1 + Math.floor(Math.random() * (d - 1));
+  lineState = { n: n, d: d, done: false };
+  document.getElementById('linePrompt').innerHTML = 'Where is <b>' + n + '/' + d + '</b>?';
+  const track = document.getElementById('lineTrack');
+  track.innerHTML = '';
+  const base = document.createElement('div'); base.className = 'line-base'; track.appendChild(base);
+  const l0 = document.createElement('div'); l0.className = 'line-end l0'; l0.textContent = '0'; track.appendChild(l0);
+  const l1 = document.createElement('div'); l1.className = 'line-end l1'; l1.textContent = '1'; track.appendChild(l1);
+  for (let i = 0; i <= d; i++) {
+    const t = document.createElement('button');
+    t.className = 'line-tick' + (i === 0 || i === d ? ' fixed' : '');
+    t.style.left = (i / d * 100) + '%';
+    t.onclick = () => linePick(i, t);
+    track.appendChild(t);
+  }
+  const msg = document.getElementById('lineMsg');
+  msg.textContent = 'Tap the right spot!'; msg.className = '';
+  setTimeout(() => speak('Where is ' + sayFrac(n, d) + '?'), 250);
+}
+function linePick(i, t) {
+  if (!lineState || lineState.done) return;
+  if (typeof sfxButton === 'function') sfxButton();
+  if (i === lineState.n) {
+    lineState.done = true;
+    t.classList.add('right');
+    t.innerHTML = '<span class="tick-lab">' + lineState.n + '/' + lineState.d + '</span>';
+    if (typeof sfxCorrect === 'function') sfxCorrect();
+    awardStars(1);
+    document.getElementById('lineWallet').textContent = wallet;
+    const msg = document.getElementById('lineMsg');
+    msg.textContent = 'Yes! ⭐'; msg.className = 'good';
+    if (typeof spawnConfetti === 'function') spawnConfetti(document.getElementById('confettiContainer'));
+    setTimeout(() => speak('Yes! ' + sayFrac(lineState.n, lineState.d)), 300);
+    checkAchievements();
+    setTimeout(genLine, 1700);
+  } else {
+    t.classList.add('wrong');
+    if (typeof sfxWrong === 'function') sfxWrong();
+    document.getElementById('lineMsg').textContent = 'Not there — try again!';
+    setTimeout(() => t.classList.remove('wrong'), 500);
+  }
+}
+function startLine() {
+  if (typeof sfxButton === 'function') sfxButton();
+  if (typeof ensureAudio === 'function') ensureAudio();
+  hideHubs();
+  document.getElementById('lineWallet').textContent = wallet;
+  genLine();
+  const ov = document.getElementById('lineOverlay');
+  ov.classList.remove('hidden'); ov.classList.add('fade-in');
+}
+function hideLine() {
+  if (typeof sfxButton === 'function') sfxButton();
+  document.getElementById('lineOverlay').classList.add('hidden');
+}
+
+// show the shop's current rank inside the shop screen
+const _ext_showShop = showShop;
+showShop = function () {
+  _ext_showShop();
+  const el = document.getElementById('shopRank');
+  if (el) { const r = rankFor(stats.served); el.innerHTML = '<span>' + r.icon + '</span> ' + r.name; }
+};
 
 // ===== INIT =====
 if (typeof settingsData.voice === 'undefined') { settingsData.voice = true; persistSettings(); }
