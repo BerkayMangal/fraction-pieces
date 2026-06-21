@@ -1,15 +1,17 @@
-/* Fraction Pieces service worker — offline app shell, stale-while-revalidate.
-   Bump CACHE on every release so clients pick up new files. */
-const CACHE = 'fp-cache-v7';
+/* Fraction Pieces service worker.
+   - HTML/navigation: network-first (always newest when online, cache offline)
+   - other assets: stale-while-revalidate
+   Bump CACHE on every release. */
+const CACHE = 'fp-cache-v8';
 const ASSETS = [
   './',
   'index.html',
   'manifest.json',
-  'style.css?v=7',
-  'levels.js?v=7',
-  'game.js?v=7',
-  'shop.js?v=7',
-  'extras.js?v=7',
+  'style.css?v=8',
+  'levels.js?v=8',
+  'game.js?v=8',
+  'shop.js?v=8',
+  'extras.js?v=8',
   'assets/start-screen.jpg',
   'assets/icon-192.png',
   'assets/icon-512.png',
@@ -27,9 +29,27 @@ self.addEventListener('activate', e => {
   );
 });
 
+function isHTML(req) {
+  return req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
+}
+
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
+
+  if (isHTML(req)) {
+    // network-first so an online launch always shows the latest version
+    e.respondWith(
+      fetch(req).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+        return res;
+      }).catch(() => caches.match(req).then(r => r || caches.match('index.html')))
+    );
+    return;
+  }
+
+  // stale-while-revalidate for everything else
   e.respondWith(
     caches.match(req).then(cached => {
       const network = fetch(req).then(res => {

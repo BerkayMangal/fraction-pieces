@@ -186,6 +186,22 @@ function renderMap() {
     }
     path.appendChild(node);
   }
+  // "you are here" mascot pin on the next level to play
+  let curIdx = 0;
+  for (let i = 0; i < levels.length; i++) {
+    const unlocked = i === 0 || (levelStars[i - 1] || 0) > 0;
+    if (!unlocked) break;
+    curIdx = i;
+    if (!(levelStars[i] > 0)) break;
+  }
+  const cur = path.children[curIdx];
+  if (cur && !cur.classList.contains('locked')) {
+    cur.classList.add('current');
+    const pin = document.createElement('div');
+    pin.className = 'map-pin';
+    pin.textContent = shopData.mascot;
+    cur.appendChild(pin);
+  }
 }
 function showMap() {
   if (typeof sfxButton === 'function') sfxButton();
@@ -353,7 +369,8 @@ function checkDaily() {
   const ys = dateStr(y);
   let streak = 1;
   if (data && data.last === ys) streak = (data.streak || 1) + 1;
-  pendingDaily = { streak: streak, bonus: Math.min(2 + streak, 10), ts: ts };
+  const best = Math.max(streak, (data && data.best) || 0);
+  pendingDaily = { streak: streak, bonus: Math.min(2 + streak, 10), ts: ts, best: best };
   document.getElementById('dailyStreak').textContent = 'Day ' + streak + ' streak! \u{1F525}';
   document.getElementById('dailyBonus').textContent = '+' + pendingDaily.bonus + ' stars for your shop!';
   document.getElementById('dailyStars').textContent = '⭐'.repeat(Math.min(pendingDaily.bonus, 8));
@@ -364,7 +381,7 @@ function claimDaily() {
   if (typeof ensureAudio === 'function') ensureAudio();
   if (pendingDaily) {
     awardStars(pendingDaily.bonus);
-    try { localStorage.setItem(LS_DAILY, JSON.stringify({ last: pendingDaily.ts, streak: pendingDaily.streak })); } catch (e) {}
+    try { localStorage.setItem(LS_DAILY, JSON.stringify({ last: pendingDaily.ts, streak: pendingDaily.streak, best: pendingDaily.best })); } catch (e) {}
     if (typeof sfxCelebrate === 'function') sfxCelebrate();
     pendingDaily = null;
     checkAchievements();
@@ -433,6 +450,102 @@ function startAddGame() {
 function hideAddGame() {
   if (typeof sfxButton === 'function') sfxButton();
   document.getElementById('addOverlay').classList.add('hidden');
+}
+
+// =============================================
+// COMPARE MINI-GAME (which fraction is bigger?)
+// =============================================
+let cmpState = null;
+function drawCmpPizza(svg, count, denom) {
+  const arr = new Array(denom).fill(null);
+  for (let i = 0; i < count; i++) arr[i] = 'cheese';
+  drawPizza(svg, arr, 80, 80, 64, true);
+}
+function genCompare() {
+  const denoms = [2, 3, 4, 6, 8];
+  const d1 = denoms[Math.floor(Math.random() * denoms.length)];
+  const d2 = denoms[Math.floor(Math.random() * denoms.length)];
+  const n1 = 1 + Math.floor(Math.random() * d1);
+  let n2 = 1 + Math.floor(Math.random() * d2), guard = 0;
+  while (Math.abs(n1 / d1 - n2 / d2) < 1e-9 && guard++ < 30) n2 = 1 + Math.floor(Math.random() * d2);
+  cmpState = { n1: n1, d1: d1, n2: n2, d2: d2, bigger: (n1 / d1) > (n2 / d2) ? 'A' : 'B', done: false };
+  drawCmpPizza(document.getElementById('cmpPizzaA'), n1, d1);
+  drawCmpPizza(document.getElementById('cmpPizzaB'), n2, d2);
+  document.getElementById('cmpLabA').textContent = n1 + '/' + d1;
+  document.getElementById('cmpLabB').textContent = n2 + '/' + d2;
+  const msg = document.getElementById('compareMsg');
+  msg.textContent = 'Tap the pizza with more!'; msg.className = '';
+  ['cmpBtnA', 'cmpBtnB'].forEach(id => document.getElementById(id).classList.remove('right', 'wrong'));
+  setTimeout(() => speak('Which is bigger? ' + sayFrac(n1, d1) + ' or ' + sayFrac(n2, d2) + '?'), 250);
+}
+function comparePick(side) {
+  if (!cmpState || cmpState.done) return;
+  if (typeof sfxButton === 'function') sfxButton();
+  const rightId = cmpState.bigger === 'A' ? 'cmpBtnA' : 'cmpBtnB';
+  if (side === cmpState.bigger) {
+    cmpState.done = true;
+    document.getElementById(rightId).classList.add('right');
+    if (typeof sfxCorrect === 'function') sfxCorrect();
+    awardStars(1);
+    document.getElementById('compareWallet').textContent = wallet;
+    const bn = side === 'A' ? cmpState.n1 + '/' + cmpState.d1 : cmpState.n2 + '/' + cmpState.d2;
+    const bd = side === 'A' ? [cmpState.n1, cmpState.d1] : [cmpState.n2, cmpState.d2];
+    const msg = document.getElementById('compareMsg');
+    msg.textContent = bn + ' is bigger! ⭐'; msg.className = 'good';
+    setTimeout(() => speak(sayFrac(bd[0], bd[1]) + ' is bigger!'), 300);
+    checkAchievements();
+    setTimeout(genCompare, 1600);
+  } else {
+    document.getElementById(side === 'A' ? 'cmpBtnA' : 'cmpBtnB').classList.add('wrong');
+    if (typeof sfxWrong === 'function') sfxWrong();
+    document.getElementById('compareMsg').textContent = 'Try the other one!';
+  }
+}
+function startCompare() {
+  if (typeof sfxButton === 'function') sfxButton();
+  if (typeof ensureAudio === 'function') ensureAudio();
+  hideMap();
+  document.getElementById('compareWallet').textContent = wallet;
+  genCompare();
+  const ov = document.getElementById('compareOverlay');
+  ov.classList.remove('hidden'); ov.classList.add('fade-in');
+}
+function hideCompare() {
+  if (typeof sfxButton === 'function') sfxButton();
+  document.getElementById('compareOverlay').classList.add('hidden');
+}
+
+// =============================================
+// PARENT DASHBOARD
+// =============================================
+function showParent() {
+  if (typeof sfxButton === 'function') sfxButton();
+  const done = levelStars.filter(s => s > 0).length;
+  let daily = {};
+  try { daily = JSON.parse(localStorage.getItem(LS_DAILY)) || {}; } catch (e) {}
+  const acc = stats.served ? Math.round(stats.threeStars / stats.served * 100) : 0;
+  const rows = [
+    ['\u{1F355} Pizzas served', stats.served],
+    ['\u{1F3AF} First-try perfect', stats.threeStars + ' (' + acc + '%)'],
+    ['\u{1F5FA} Levels completed', done + ' / ' + levels.length],
+    ['\u{1F3C6} Badges earned', achUnlocked.length + ' / ' + ACHS.length],
+    ['⭐ Stars earned (total)', lifetime],
+    ['\u{1F525} Best daily streak', (daily.best || daily.streak || 0) + ' days']
+  ];
+  const box = document.getElementById('parentStats');
+  box.innerHTML = '';
+  rows.forEach(r => {
+    const d = document.createElement('div');
+    d.className = 'parent-row';
+    d.innerHTML = '<span>' + r[0] + '</span><b>' + r[1] + '</b>';
+    box.appendChild(d);
+  });
+  const ov = document.getElementById('parentOverlay');
+  ov.classList.remove('hidden'); ov.classList.add('fade-in');
+}
+function hideParent() {
+  if (typeof sfxButton === 'function') sfxButton();
+  document.getElementById('parentOverlay').classList.add('hidden');
 }
 
 // ===== INIT =====

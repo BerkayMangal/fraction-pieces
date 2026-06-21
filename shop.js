@@ -44,13 +44,14 @@ const SHOP_AWNINGS = [
   { id: '#4caf50', cost: 2 }
 ];
 
+// each background is a little "world" — sets the scene + the floating objects
 const SHOP_BGS = [
-  { id: 'warm',     bg: 'radial-gradient(ellipse at 50% 0%,#ffe8b8 0%,transparent 50%),linear-gradient(180deg,#fff3d6 0%,#f5d5a0 40%,#e8ba78 100%)', swatch: 'linear-gradient(180deg,#fff3d6,#e8ba78)', cost: 0 },
-  { id: 'sky',      bg: 'linear-gradient(180deg,#dff1ff 0%,#acd8ff 60%,#7cc0f5 100%)', swatch: 'linear-gradient(180deg,#dff1ff,#7cc0f5)', cost: 4 },
-  { id: 'mint',     bg: 'linear-gradient(180deg,#e3fbe9 0%,#bff0cd 60%,#8fe0aa 100%)', swatch: 'linear-gradient(180deg,#e3fbe9,#8fe0aa)', cost: 4 },
-  { id: 'pink',     bg: 'linear-gradient(180deg,#ffe6f2 0%,#ffc2dd 60%,#ff9cc4 100%)', swatch: 'linear-gradient(180deg,#ffe6f2,#ff9cc4)', cost: 5 },
-  { id: 'lavender', bg: 'linear-gradient(180deg,#efe7ff 0%,#d6c2ff 60%,#bfa3ff 100%)', swatch: 'linear-gradient(180deg,#efe7ff,#bfa3ff)', cost: 5 },
-  { id: 'night',    bg: 'radial-gradient(circle at 70% 18%,rgba(255,255,255,0.25) 0,transparent 18%),linear-gradient(180deg,#2b2350 0%,#4b3b7a 60%,#7a5aa8 100%)', swatch: 'linear-gradient(180deg,#2b2350,#7a5aa8)', cost: 7 }
+  { id: 'warm',     name: 'Pizzeria', floaters: ['\u{1F355}','\u{1F9C0}','\u{1F345}','⭐','\u{1F525}','\u{1F344}'], bg: 'radial-gradient(ellipse at 50% 0%,#ffe8b8 0%,transparent 50%),linear-gradient(180deg,#fff3d6 0%,#f5d5a0 40%,#e8ba78 100%)', swatch: 'linear-gradient(180deg,#fff3d6,#e8ba78)', cost: 0 },
+  { id: 'sky',      name: 'Sky',      floaters: ['☁️','\u{1F426}','⭐','\u{1FA81}','\u{1F308}','\u{1F388}'], bg: 'linear-gradient(180deg,#dff1ff 0%,#acd8ff 60%,#7cc0f5 100%)', swatch: 'linear-gradient(180deg,#dff1ff,#7cc0f5)', cost: 4 },
+  { id: 'mint',     name: 'Meadow',   floaters: ['\u{1F33F}','\u{1F338}','\u{1F98B}','\u{1F340}','\u{1F41D}','\u{1F33C}'], bg: 'linear-gradient(180deg,#e3fbe9 0%,#bff0cd 60%,#8fe0aa 100%)', swatch: 'linear-gradient(180deg,#e3fbe9,#8fe0aa)', cost: 4 },
+  { id: 'pink',     name: 'Candy',    floaters: ['\u{1F36D}','\u{1F36C}','\u{1F9C1}','\u{1F369}','\u{1F495}','\u{1F338}'], bg: 'linear-gradient(180deg,#ffe6f2 0%,#ffc2dd 60%,#ff9cc4 100%)', swatch: 'linear-gradient(180deg,#ffe6f2,#ff9cc4)', cost: 5 },
+  { id: 'sea',      name: 'Ocean',    floaters: ['\u{1F420}','\u{1F41A}','\u{1F419}','\u{1F421}','\u{1F30A}','\u{1F990}'], bg: 'linear-gradient(180deg,#bfefff 0%,#74d0e8 55%,#2a8fb8 100%)', swatch: 'linear-gradient(180deg,#bfefff,#2a8fb8)', cost: 6 },
+  { id: 'night',    name: 'Space',    floaters: ['\u{1FA90}','\u{1F680}','⭐','\u{1F6F8}','\u{1F31F}','☄️'], bg: 'radial-gradient(circle at 70% 18%,rgba(255,255,255,0.25) 0,transparent 18%),linear-gradient(180deg,#2b2350 0%,#4b3b7a 60%,#7a5aa8 100%)', swatch: 'linear-gradient(180deg,#2b2350,#7a5aa8)', cost: 7 }
 ];
 
 const SHOP_DECOS = [
@@ -163,6 +164,26 @@ function applyShop() {
   const hMascot = document.getElementById('shopHeaderMascot');
   if (hdr) hdr.textContent = shopData.name;
   if (hMascot) hMascot.textContent = shopData.mascot;
+
+  setWorldFloaters(bgById(shopData.bgId).floaters);
+}
+
+// rebuild the drifting background objects to match the chosen world
+function setWorldFloaters(items) {
+  const c = document.getElementById('floatingBg');
+  if (!c || !items) return;
+  c.innerHTML = '';
+  for (let i = 0; i < 15; i++) {
+    const el = document.createElement('div');
+    el.className = 'float-item';
+    el.textContent = items[i % items.length];
+    el.style.left = (Math.random() * 100) + '%';
+    el.style.fontSize = (18 + Math.random() * 16) + 'px';
+    el.style.setProperty('--dur', (10 + Math.random() * 15) + 's');
+    el.style.setProperty('--delay', (Math.random() * 10) + 's');
+    el.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+    c.appendChild(el);
+  }
 }
 
 function applySettings() {
@@ -292,11 +313,14 @@ function renderShopUI() {
       () => acquire('awning', a.id, a.cost, () => { shopData.awning = a.id; })));
   });
 
-  // backgrounds
+  // worlds (background + floating objects)
   const bc = document.getElementById('shopBgChoices'); bc.innerHTML = '';
   SHOP_BGS.forEach(b => {
-    const d = document.createElement('div'); d.className = 'bg-choice'; d.style.background = b.swatch;
-    bc.appendChild(makeItem(d, isOwned('bg', b.id), b.cost, shopData.bgId === b.id,
+    const inner = document.createElement('div'); inner.className = 'world-choice';
+    const sw = document.createElement('div'); sw.className = 'bg-choice'; sw.style.background = b.swatch;
+    const lbl = document.createElement('div'); lbl.className = 'world-name'; lbl.textContent = b.name;
+    inner.appendChild(sw); inner.appendChild(lbl);
+    bc.appendChild(makeItem(inner, isOwned('bg', b.id), b.cost, shopData.bgId === b.id,
       () => acquire('bg', b.id, b.cost, () => { shopData.bgId = b.id; })));
   });
 

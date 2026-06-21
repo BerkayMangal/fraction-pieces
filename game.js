@@ -142,6 +142,7 @@ function sfxSelect() {
 }
 
 function sfxPlace() {
+  if (sfxEnabled && navigator.vibrate) navigator.vibrate(15);
   if (!sfxEnabled || !audioCtx) return;
   // Cartoon "plop" = quick pitch drop + noise
   const ctx = audioCtx;
@@ -161,6 +162,7 @@ function sfxPlace() {
 }
 
 function sfxCorrect() {
+  if (sfxEnabled && navigator.vibrate) navigator.vibrate([20, 40, 20]);
   if (!sfxEnabled || !audioCtx) return;
   // Happy ascending arpeggio
   const notes = [523, 659, 784, 1047];
@@ -173,6 +175,7 @@ function sfxCorrect() {
 }
 
 function sfxWrong() {
+  if (sfxEnabled && navigator.vibrate) navigator.vibrate(60);
   if (!sfxEnabled || !audioCtx) return;
   // Descending "womp womp"
   const ctx = audioCtx;
@@ -208,6 +211,7 @@ function sfxWrong() {
 }
 
 function sfxCelebrate() {
+  if (sfxEnabled && navigator.vibrate) navigator.vibrate([30, 30, 30, 30, 70]);
   if (!sfxEnabled || !audioCtx) return;
   // Fanfare! Major chord arpeggiate then resolve
   const melody = [523, 523, 659, 784, 659, 784, 1047];

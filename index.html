@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fractions">
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -195,8 +195,8 @@
     </div>
 
     <div class="shop-field">
-      <label>&#127749; Background</label>
-      <div id="shopBgChoices" class="item-row"></div>
+      <label>&#127757; World</label>
+      <div id="shopBgChoices" class="item-row item-row-wide"></div>
     </div>
 
     <div class="shop-field">
@@ -232,6 +232,7 @@
       <input id="brightnessSlider" type="range" min="40" max="100" value="100" oninput="onBrightnessChange(this.value)">
     </div>
 
+    <button class="ghost-btn" onclick="showParent()">&#128106; For Parents</button>
     <button class="danger-btn" onclick="resetProgressBtn()">&#8634; Reset progress</button>
     <button class="danger-btn" onclick="resetShopBtn()">&#128465; Reset shop</button>
     <button onclick="hideSettings()">Done</button>
@@ -249,6 +250,40 @@
     <div id="mapPath"></div>
     <button id="freePlayBtn" onclick="startEndless()">&#9854; Free Play (endless!)</button>
     <button id="addGameBtn" onclick="startAddGame()">&#10133; Add Pizzas! (mini-game)</button>
+    <button id="compareBtn" onclick="startCompare()">&#9878; Which is Bigger? (mini-game)</button>
+  </div>
+</div>
+
+<!-- ========== COMPARE MINI-GAME ========== -->
+<div id="compareOverlay" class="overlay hidden">
+  <div class="card compare-card">
+    <div class="shop-topbar">
+      <button class="ghost-btn shop-back" onclick="hideCompare()">&#8249; Back</button>
+      <div class="wallet-badge"><span class="star-icon">&#9733;</span> <span id="compareWallet">0</span></div>
+    </div>
+    <h2>&#9878; Which is bigger?</h2>
+    <div id="compareRow">
+      <button class="compare-pick" id="cmpBtnA" onclick="comparePick('A')">
+        <svg id="cmpPizzaA" viewBox="0 0 160 160" width="94" height="94"></svg>
+        <div class="cmp-label" id="cmpLabA"></div>
+      </button>
+      <span class="add-op">vs</span>
+      <button class="compare-pick" id="cmpBtnB" onclick="comparePick('B')">
+        <svg id="cmpPizzaB" viewBox="0 0 160 160" width="94" height="94"></svg>
+        <div class="cmp-label" id="cmpLabB"></div>
+      </button>
+    </div>
+    <div id="compareMsg">Tap the pizza with more!</div>
+  </div>
+</div>
+
+<!-- ========== PARENT DASHBOARD ========== -->
+<div id="parentOverlay" class="overlay hidden">
+  <div class="card parent-card">
+    <div class="card-emoji">&#128106;</div>
+    <h2>For Parents</h2>
+    <div id="parentStats"></div>
+    <button onclick="hideParent()">Done</button>
   </div>
 </div>
 
@@ -298,14 +333,18 @@
 <!-- generic reward toast (shared) -->
 <div id="achToast"></div>
 
-<script src="levels.js?v=7"></script>
-<script src="game.js?v=7"></script>
-<script src="shop.js?v=7"></script>
-<script src="extras.js?v=7"></script>
+<script src="levels.js?v=8"></script>
+<script src="game.js?v=8"></script>
+<script src="shop.js?v=8"></script>
+<script src="extras.js?v=8"></script>
 <script>
 if ('serviceWorker' in navigator) {
+  var fp_refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (fp_refreshing) return; fp_refreshing = true; location.reload();
+  });
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=7').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=8').catch(function () {});
   });
 }
 </script>
