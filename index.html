@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fractions">
-<link rel="stylesheet" href="style.css?v=8">
+<link rel="stylesheet" href="style.css?v=9">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -333,10 +333,10 @@
 <!-- generic reward toast (shared) -->
 <div id="achToast"></div>
 
-<script src="levels.js?v=8"></script>
-<script src="game.js?v=8"></script>
-<script src="shop.js?v=8"></script>
-<script src="extras.js?v=8"></script>
+<script src="levels.js?v=9"></script>
+<script src="game.js?v=9"></script>
+<script src="shop.js?v=9"></script>
+<script src="extras.js?v=9"></script>
 <script>
 if ('serviceWorker' in navigator) {
   var fp_refreshing = false;
@@ -344,7 +344,7 @@ if ('serviceWorker' in navigator) {
     if (fp_refreshing) return; fp_refreshing = true; location.reload();
   });
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=8').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=9').catch(function () {});
   });
 }
 </script>

@@ -214,7 +214,7 @@ function hideMap() { document.getElementById('mapOverlay').classList.add('hidden
 
 function showGameScreen() {
   document.getElementById('startScreen').style.display = 'none';
-  document.getElementById('gameScreen').style.display = 'block';
+  document.getElementById('gameScreen').style.display = 'flex';
 }
 
 // play a specific campaign level (from the map)

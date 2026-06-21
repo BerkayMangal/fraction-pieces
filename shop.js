@@ -526,7 +526,7 @@ startGame = function () {
 
   if (typeof ensureAudio === 'function') ensureAudio();
   document.getElementById('startScreen').style.display = 'none';
-  document.getElementById('gameScreen').style.display = 'block';
+  document.getElementById('gameScreen').style.display = 'flex';
   currentLevel = resume;
   totalStars = prog.stars || 0;
   loadLevel(resume);

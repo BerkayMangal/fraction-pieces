@@ -772,7 +772,7 @@ function showGameComplete() {
 function startGame() {
   ensureAudio();
   $('startScreen').style.display = 'none';
-  $('gameScreen').style.display = 'block';
+  $('gameScreen').style.display = 'flex';
   currentLevel = 0;
   totalStars = 0;
   loadLevel(0);
