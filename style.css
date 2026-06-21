@@ -819,3 +819,59 @@ body{
   #soundControls{margin-bottom:2px}.sound-btn{width:30px;height:30px;font-size:14px}
 }
 
+
+/* =====================================================
+   FINAL POLISH (pilot build) — clarity, consistency, vibrance
+   Loaded last so it wins; fixes .card-button specificity bleed.
+   ===================================================== */
+
+/* warmer, deeper modal backdrop for focus */
+.overlay{background:rgba(46,24,8,0.60);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+
+/* premium, layered card frame */
+.card{box-shadow:0 24px 60px rgba(55,28,4,0.34),0 0 0 4px #fff,0 0 0 8px rgba(255,178,84,0.30)}
+.card::-webkit-scrollbar{width:0;height:0}
+
+/* crisp white-on-color button text */
+.card button:not(.ghost-btn):not(.danger-btn):not(.answer-btn):not(.match-opt):not(.compare-pick),
+.start-btn.c-cyan,.start-btn.c-purple,.start-btn.c-red,.start-btn.c-green,#playButton,
+.game-card,.math-progress,#shopHeader{text-shadow:0 1px 1.5px rgba(0,0,0,0.20)}
+
+/* On/Off toggles: clear green = on, grey = off (was bleeding orange) */
+.pill-toggle{background:linear-gradient(180deg,#5bc85f,#3d9f43)!important;box-shadow:0 3px 0 #2e7d32!important}
+.pill-toggle.off{background:linear-gradient(180deg,#c7bfb2,#a59c8e)!important;box-shadow:0 3px 0 #847b6c!important}
+
+/* quiz answers: neutral base so green/red feedback pops (learning clarity) */
+.answer-btn{background:#fff6e6!important;color:#5a4a3a!important;border:3px solid #ecdcc0!important;box-shadow:0 4px 0 #e2d2b6!important;font-size:26px}
+.answer-btn:active{transform:translateY(3px) scale(0.98);box-shadow:0 0 0 #e2d2b6!important}
+.answer-btn.correct{background:#bfe9c1!important;border-color:#4caf50!important;color:#1f6b27!important;box-shadow:0 4px 0 #3f9445!important}
+.answer-btn.wrong{background:#ffcfd3!important;border-color:#e53935!important;color:#b3201b!important;box-shadow:0 4px 0 #d4322d!important}
+
+/* compare / match option tiles: neutral so the right/wrong state reads */
+.match-opt,.compare-pick{background:#fff6e6!important;border-color:#ecdcc0!important}
+.match-opt.right,.compare-pick.right{background:#bfe9c1!important;border-color:#4caf50!important}
+.match-opt.wrong,.compare-pick.wrong{background:#ffcfd3!important;border-color:#e53935!important}
+
+/* clearer ghost buttons (readable, defined) */
+.start-btn.ghost{color:#8a4d00;font-weight:700;border:2px solid #f3d8a6}
+.ghost-btn{color:#7a5a36!important;font-weight:700}
+
+/* bigger, friendlier fraction-bar segments */
+.frac-seg{height:26px;border-radius:7px;border-width:2.5px}
+
+/* question pizza + prompt a touch larger for 6-10 yos */
+#questionText{font-size:24px}
+#questionEmoji{font-size:56px}
+
+/* shop header: slightly stronger so the shop name reads on any theme */
+#shopHeader{font-size:17px;letter-spacing:0.3px}
+
+/* start hero: intentional framed look */
+#startHeroWrap{padding-top:calc(env(safe-area-inset-top) + 2px)}
+.startImage{box-shadow:0 10px 26px rgba(0,0,0,0.35)}
+
+/* consistent, satisfying press on the colored start/menu buttons */
+.start-btn:active,.game-card:active,.math-stage:active,.map-node:active{filter:brightness(0.97)}
+
+/* level/star/wallet badges: a hair more pop */
+#levelBadge,#starCount,.wallet-badge{font-weight:700}
