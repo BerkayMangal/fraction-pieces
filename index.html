@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Fraction Pieces</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -69,10 +69,13 @@
   <!-- Order card -->
   <div id="orderCard">
     <div id="orderLeft">
-      <div id="orderTitle">Order</div>
+      <div id="orderCustomer">&#128048;</div>
       <svg id="orderPizza" viewBox="0 0 120 120" width="80" height="80"></svg>
     </div>
-    <div id="orderFractions"></div>
+    <div id="orderRight">
+      <div id="orderSpeech">wants this pizza!</div>
+      <div id="orderFractions"></div>
+    </div>
   </div>
 
   <!-- Pizza area -->
@@ -136,46 +139,58 @@
 <!-- ========== MY PIZZA SHOP ========== -->
 <div id="shopOverlay" class="overlay hidden">
   <div class="card shop-card">
-    <div class="card-emoji">&#127829;</div>
-    <h2>My Pizza Shop</h2>
+
+    <div class="shop-topbar">
+      <button class="ghost-btn shop-back" onclick="hideShop()">&#8249; Back</button>
+      <div class="wallet-badge"><span class="star-icon">&#9733;</span> <span id="shopWallet">0</span></div>
+    </div>
+
+    <!-- Storefront scene -->
+    <div id="shopScene">
+      <div id="sceneSky"></div>
+      <div id="sceneGround"></div>
+      <div id="sceneBuilding">
+        <div id="sceneAwning"></div>
+        <div id="sceneSign"><span id="sceneMascot">&#127829;</span><span id="sceneName">My Pizza Shop</span></div>
+        <div id="sceneWindow"></div>
+        <div id="sceneDoor"></div>
+      </div>
+      <div id="sceneDecos"></div>
+    </div>
 
     <div class="shop-field">
-      <label>Shop name</label>
+      <label>&#127991; Shop name</label>
       <input id="shopNameInput" type="text" maxlength="22" placeholder="Lina's Pizzeria" autocomplete="off">
     </div>
 
     <div class="shop-field">
-      <label>Sign color</label>
-      <div id="shopThemeSwatches" class="swatch-row"></div>
+      <label>&#127912; Sign color</label>
+      <div id="shopThemeSwatches" class="item-row"></div>
     </div>
 
     <div class="shop-field">
-      <label>Logo / Mascot</label>
-      <div id="shopMascotChoices" class="emoji-row"></div>
+      <label>&#11088; Logo / Mascot</label>
+      <div id="shopMascotChoices" class="item-row"></div>
     </div>
 
     <div class="shop-field">
-      <label>Awning color</label>
-      <div id="shopAwningSwatches" class="swatch-row"></div>
+      <label>&#127983; Awning color</label>
+      <div id="shopAwningSwatches" class="item-row"></div>
     </div>
 
     <div class="shop-field">
-      <label>Background</label>
-      <div id="shopBgChoices" class="bg-row"></div>
+      <label>&#127749; Background</label>
+      <div id="shopBgChoices" class="item-row"></div>
     </div>
 
-    <!-- Live preview -->
-    <div id="shopPreview">
-      <div id="shopPreviewAwning"></div>
-      <div id="shopPreviewSign">
-        <span id="shopPreviewMascot">&#127829;</span>
-        <span id="shopPreviewName">My Pizza Shop</span>
-      </div>
+    <div class="shop-field">
+      <label>&#10024; Decorations <span class="field-hint">(tap to place)</span></label>
+      <div id="shopDecoChoices" class="item-row"></div>
     </div>
 
-    <button onclick="saveShop()">Save my shop! &#10003;</button>
-    <button class="ghost-btn" onclick="hideShop()">Back</button>
+    <button onclick="hideShop()">Done &#10003;</button>
   </div>
+  <div id="shopToast"></div>
 </div>
 
 <!-- ========== SETTINGS ========== -->
@@ -203,9 +218,9 @@
   </div>
 </div>
 
-<script src="levels.js"></script>
-<script src="game.js"></script>
-<script src="shop.js"></script>
+<script src="levels.js?v=6"></script>
+<script src="game.js?v=6"></script>
+<script src="shop.js?v=6"></script>
 </body>
 </html>
 
