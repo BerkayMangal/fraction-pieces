@@ -212,6 +212,25 @@ function showMap() {
 }
 function hideMap() { document.getElementById('mapOverlay').classList.add('hidden'); }
 
+// close any hub (map / games) before launching a mini-game
+function hideHubs() {
+  document.getElementById('mapOverlay').classList.add('hidden');
+  document.getElementById('gamesOverlay').classList.add('hidden');
+}
+
+// ===== MINI GAMES HUB =====
+function showGames() {
+  if (typeof sfxButton === 'function') sfxButton();
+  if (typeof ensureAudio === 'function') ensureAudio();
+  document.getElementById('gamesWallet').textContent = wallet;
+  const ov = document.getElementById('gamesOverlay');
+  ov.classList.remove('hidden'); ov.classList.add('fade-in'); ov.scrollTop = 0;
+}
+function hideGames() {
+  if (typeof sfxButton === 'function') sfxButton();
+  document.getElementById('gamesOverlay').classList.add('hidden');
+}
+
 function showGameScreen() {
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('gameScreen').style.display = 'flex';
@@ -222,7 +241,7 @@ function beginLevel(idx) {
   if (typeof sfxButton === 'function') sfxButton();
   if (typeof ensureAudio === 'function') ensureAudio();
   endless = false; levelOverride = null;
-  hideMap();
+  hideHubs();
   showGameScreen();
   document.getElementById('progressDots').style.display = '';
   document.getElementById('endlessBadge').style.display = 'none';
@@ -251,7 +270,7 @@ function startEndless() {
   if (typeof sfxButton === 'function') sfxButton();
   if (typeof ensureAudio === 'function') ensureAudio();
   endless = true; served = 0; levelOverride = { order: genOrder() };
-  hideMap();
+  hideHubs();
   showGameScreen();
   document.getElementById('progressDots').style.display = 'none';
   const badge = document.getElementById('endlessBadge');
@@ -441,7 +460,7 @@ function addAnswer(btn, chosen, correct) {
 function startAddGame() {
   if (typeof sfxButton === 'function') sfxButton();
   if (typeof ensureAudio === 'function') ensureAudio();
-  hideMap();
+  hideHubs();
   document.getElementById('addWallet').textContent = wallet;
   genAddRound();
   const ov = document.getElementById('addOverlay');
@@ -504,7 +523,7 @@ function comparePick(side) {
 function startCompare() {
   if (typeof sfxButton === 'function') sfxButton();
   if (typeof ensureAudio === 'function') ensureAudio();
-  hideMap();
+  hideHubs();
   document.getElementById('compareWallet').textContent = wallet;
   genCompare();
   const ov = document.getElementById('compareOverlay');
@@ -546,6 +565,91 @@ function showParent() {
 function hideParent() {
   if (typeof sfxButton === 'function') sfxButton();
   document.getElementById('parentOverlay').classList.add('hidden');
+}
+
+// =============================================
+// FIND THE MATCH MINI-GAME (equivalent fractions)
+// =============================================
+let matchState = null;
+const MATCH_BASES = [[1, 2], [1, 3], [2, 3], [1, 4], [3, 4]];
+function eqFracs(sn, sd) {
+  const res = [];
+  [2, 3, 4, 6, 8].forEach(d => { if (d % sd === 0) { const k = d / sd; res.push([sn * k, d]); } });
+  return res;
+}
+function drawMatchPizza(svg, n, d) {
+  const arr = new Array(d).fill(null);
+  for (let i = 0; i < n; i++) arr[i] = 'cheese';
+  drawPizza(svg, arr, 80, 80, 64, true);
+}
+function genMatch() {
+  const base = MATCH_BASES[Math.floor(Math.random() * MATCH_BASES.length)];
+  const all = eqFracs(base[0], base[1]);
+  const target = all[Math.floor(Math.random() * all.length)];
+  const corrCands = all.filter(f => f[1] !== target[1]);
+  const correct = corrCands[Math.floor(Math.random() * corrCands.length)];
+  const tv = target[0] / target[1];
+  const distractors = [];
+  let guard = 0;
+  while (distractors.length < 2 && guard++ < 120) {
+    const d = [2, 3, 4, 6, 8][Math.floor(Math.random() * 5)];
+    const n = 1 + Math.floor(Math.random() * d);
+    if (Math.abs(n / d - tv) < 1e-9) continue;
+    if (n === correct[0] && d === correct[1]) continue;
+    if (distractors.some(x => x[0] === n && x[1] === d)) continue;
+    distractors.push([n, d]);
+  }
+  matchState = { target: target, correct: correct, done: false };
+  drawMatchPizza(document.getElementById('matchTarget'), target[0], target[1]);
+  document.getElementById('matchTargetLabel').textContent = target[0] + '/' + target[1];
+  const opts = [correct].concat(distractors).sort(() => Math.random() - 0.5);
+  const box = document.getElementById('matchOptions');
+  box.innerHTML = '';
+  opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'match-opt';
+    btn.innerHTML = '<svg id="matchOpt' + i + '" viewBox="0 0 160 160" width="72" height="72"></svg><div class="cmp-label">' + o[0] + '/' + o[1] + '</div>';
+    box.appendChild(btn);
+    drawMatchPizza(btn.querySelector('svg'), o[0], o[1]);
+    btn.onclick = () => matchPick(o[0], o[1], btn);
+  });
+  const msg = document.getElementById('matchMsg');
+  msg.textContent = 'Which one is the same?'; msg.className = '';
+  setTimeout(() => speak('Which one is the same as ' + sayFrac(target[0], target[1]) + '?'), 250);
+}
+function matchPick(n, d, btn) {
+  if (!matchState || matchState.done) return;
+  if (typeof sfxButton === 'function') sfxButton();
+  if (n === matchState.correct[0] && d === matchState.correct[1]) {
+    matchState.done = true;
+    btn.classList.add('right');
+    if (typeof sfxCorrect === 'function') sfxCorrect();
+    awardStars(1);
+    document.getElementById('matchWallet').textContent = wallet;
+    const t = matchState.target;
+    const msg = document.getElementById('matchMsg');
+    msg.textContent = t[0] + '/' + t[1] + ' = ' + n + '/' + d + '! ⭐'; msg.className = 'good';
+    setTimeout(() => speak(sayFrac(t[0], t[1]) + ' is the same as ' + sayFrac(n, d)), 300);
+    checkAchievements();
+    setTimeout(genMatch, 1700);
+  } else {
+    btn.classList.add('wrong');
+    if (typeof sfxWrong === 'function') sfxWrong();
+    document.getElementById('matchMsg').textContent = 'Not the same — try again!';
+  }
+}
+function startMatch() {
+  if (typeof sfxButton === 'function') sfxButton();
+  if (typeof ensureAudio === 'function') ensureAudio();
+  hideHubs();
+  document.getElementById('matchWallet').textContent = wallet;
+  genMatch();
+  const ov = document.getElementById('matchOverlay');
+  ov.classList.remove('hidden'); ov.classList.add('fade-in');
+}
+function hideMatch() {
+  if (typeof sfxButton === 'function') sfxButton();
+  document.getElementById('matchOverlay').classList.add('hidden');
 }
 
 // ===== INIT =====

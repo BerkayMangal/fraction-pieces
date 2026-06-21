@@ -2,16 +2,16 @@
    - HTML/navigation: network-first (always newest when online, cache offline)
    - other assets: stale-while-revalidate
    Bump CACHE on every release. */
-const CACHE = 'fp-cache-v10';
+const CACHE = 'fp-cache-v11';
 const ASSETS = [
   './',
   'index.html',
   'manifest.json',
-  'style.css?v=10',
-  'levels.js?v=10',
-  'game.js?v=10',
-  'shop.js?v=10',
-  'extras.js?v=10',
+  'style.css?v=11',
+  'levels.js?v=11',
+  'game.js?v=11',
+  'shop.js?v=11',
+  'extras.js?v=11',
   'assets/start-hero.jpg',
   'assets/icon-192.png',
   'assets/icon-512.png',

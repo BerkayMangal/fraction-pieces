@@ -60,8 +60,10 @@ body{
   box-shadow:0 4px 0 rgba(0,0,0,0.28);
 }
 .start-btn:active{transform:translateY(3px);box-shadow:0 0 0 rgba(0,0,0,0.28)}
-.start-row .start-btn.alt:nth-child(1){background:linear-gradient(180deg,#4dd0e1,#1ba0b8);box-shadow:0 4px 0 #00788a}
-.start-row .start-btn.alt:nth-child(2){background:linear-gradient(180deg,#ff8a65,#f4511e);box-shadow:0 4px 0 #bf360c}
+.start-btn.c-cyan{background:linear-gradient(180deg,#4dd0e1,#1ba0b8);box-shadow:0 4px 0 #00788a}
+.start-btn.c-purple{background:linear-gradient(180deg,#b07cf0,#8b5cf6);box-shadow:0 4px 0 #6d28d9}
+.start-btn.c-red{background:linear-gradient(180deg,#ff8a65,#f4511e);box-shadow:0 4px 0 #bf360c}
+.start-btn.c-gold{background:linear-gradient(180deg,#ffd24d,#ffb300);box-shadow:0 4px 0 #cc8f00;color:#7a5200}
 .start-btn.ghost{background:linear-gradient(180deg,#fff,#ffeccb);color:#a85d00;font-size:13px;padding:12px 4px;box-shadow:0 4px 0 #e6cb98}
 
 /* ===== HOW TO PLAY ===== */
@@ -682,6 +684,49 @@ body{
     radial-gradient(rgba(255,255,255,0.30) 1.5px, transparent 1.6px) 0 0/26px 26px,
     radial-gradient(rgba(255,140,0,0.06) 1.5px, transparent 1.6px) 13px 13px/26px 26px;
 }
+
+/* ===== MINI GAMES HUB ===== */
+.games-card{max-width:380px;text-align:center}
+.games-list{display:flex;flex-direction:column;gap:11px;margin-top:6px}
+.game-card{
+  display:flex;align-items:center;gap:13px;text-align:left;width:100%;
+  border:none;cursor:pointer;border-radius:18px;padding:14px 16px;color:#fff;
+  font-family:'Fredoka',sans-serif;box-shadow:0 4px 0 rgba(0,0,0,0.22);
+  transition:transform 0.12s;
+}
+.game-card:active{transform:translateY(3px);box-shadow:0 0 0 rgba(0,0,0,0.22)}
+.gc-ic{font-size:32px;flex-shrink:0;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.2))}
+.gc-txt{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.gc-txt b{font-size:17px}
+.gc-txt small{font-size:12px;opacity:0.92;font-weight:500}
+.game-card.g1{background:linear-gradient(135deg,#9575cd,#7e57c2);box-shadow:0 4px 0 #5e35b1}
+.game-card.g2{background:linear-gradient(135deg,#4dd0e1,#1ba0b8);box-shadow:0 4px 0 #00838f}
+.game-card.g3{background:linear-gradient(135deg,#ffb74d,#fb8c00);box-shadow:0 4px 0 #e65100}
+.game-card.g4{background:linear-gradient(135deg,#f06292,#e91e63);box-shadow:0 4px 0 #ad1457}
+#gamesBtnMap{background:linear-gradient(180deg,#b07cf0,#8b5cf6)!important;box-shadow:0 4px 0 #6d28d9,0 6px 16px rgba(0,0,0,0.15)!important}
+
+/* ===== FIND THE MATCH MINI-GAME ===== */
+.match-card{max-width:380px;text-align:center}
+.match-card h2{margin-bottom:12px}
+#matchTargetWrap{margin-bottom:12px}
+#matchTargetWrap .cmp-label{margin-top:2px;font-size:22px;font-weight:700;color:#5a4a3a}
+#matchOptions{display:flex;justify-content:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.match-opt{
+  background:#faf5eb;border:3px solid #e8dcc8;border-radius:16px;padding:6px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'Fredoka',sans-serif;
+}
+.match-opt .cmp-label{font-size:16px;font-weight:700;color:#5a4a3a}
+.match-opt:active{transform:scale(0.94)}
+.match-opt.right{border-color:#4caf50;background:#e8f9e8;animation:correctBounce 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+.match-opt.wrong{border-color:#e53935;background:#ffe5e5;animation:wrongShake 0.4s}
+#matchMsg{font-size:16px;font-weight:600;color:#8b7355;min-height:22px}
+#matchMsg.good{color:#2e7d32}
+
+/* ===== GENERAL POLISH: consistent scrollable overlay cards ===== */
+.shop-card,.settings-card,.map-card,.ach-card,.games-card,.match-card,.compare-card,.add-card,.parent-card{
+  max-height:90dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+.card h2{letter-spacing:0.3px}
 
 /* ===== RESPONSIVE ===== */
 @media(min-width:500px){#gameScreen{max-width:460px;margin:0 auto}}

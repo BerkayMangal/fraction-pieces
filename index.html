@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fractions">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -31,12 +31,15 @@
   <div id="startMenu">
     <button id="playButton" onclick="startGame()">&#9654; PLAY</button>
     <div class="start-row">
-      <button class="start-btn alt" onclick="showMap()">&#128506; Levels</button>
-      <button class="start-btn alt" onclick="showShop()">&#127829; Pizza Shop</button>
+      <button class="start-btn c-cyan" onclick="showMap()">&#128506; Levels</button>
+      <button class="start-btn c-purple" onclick="showGames()">&#127918; Mini Games</button>
+    </div>
+    <div class="start-row">
+      <button class="start-btn c-red" onclick="showShop()">&#127829; Pizza Shop</button>
+      <button class="start-btn c-gold" onclick="showAchievements()">&#127942; Badges</button>
     </div>
     <div class="start-row">
       <button class="start-btn ghost" onclick="showHowToPlay()">&#10067; Help</button>
-      <button class="start-btn ghost" onclick="showAchievements()">&#127942; Badges</button>
       <button class="start-btn ghost" onclick="showSettings()">&#9881; Settings</button>
     </div>
   </div>
@@ -254,9 +257,41 @@
     </div>
     <h2>&#128506; Pizza Journey</h2>
     <div id="mapPath"></div>
-    <button id="freePlayBtn" onclick="startEndless()">&#9854; Free Play (endless!)</button>
-    <button id="addGameBtn" onclick="startAddGame()">&#10133; Add Pizzas! (mini-game)</button>
-    <button id="compareBtn" onclick="startCompare()">&#9878; Which is Bigger? (mini-game)</button>
+    <button id="gamesBtnMap" onclick="showGames()">&#127918; Mini Games</button>
+  </div>
+</div>
+
+<!-- ========== MINI GAMES HUB ========== -->
+<div id="gamesOverlay" class="overlay hidden">
+  <div class="card games-card">
+    <div class="shop-topbar">
+      <button class="ghost-btn shop-back" onclick="hideGames()">&#8249; Back</button>
+      <div class="wallet-badge"><span class="star-icon">&#9733;</span> <span id="gamesWallet">0</span></div>
+    </div>
+    <h2>&#127918; Mini Games</h2>
+    <div class="games-list">
+      <button class="game-card g1" onclick="startEndless()"><span class="gc-ic">&#9854;</span><span class="gc-txt"><b>Free Play</b><small>Endless pizzas — earn stars!</small></span></button>
+      <button class="game-card g2" onclick="startAddGame()"><span class="gc-ic">&#10133;</span><span class="gc-txt"><b>Add Pizzas</b><small>Add two fractions together</small></span></button>
+      <button class="game-card g3" onclick="startCompare()"><span class="gc-ic">&#9878;</span><span class="gc-txt"><b>Which is Bigger?</b><small>Compare two fractions</small></span></button>
+      <button class="game-card g4" onclick="startMatch()"><span class="gc-ic">&#129380;</span><span class="gc-txt"><b>Find the Match</b><small>Find the same amount (equal fractions)</small></span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== FIND THE MATCH MINI-GAME ========== -->
+<div id="matchOverlay" class="overlay hidden">
+  <div class="card match-card">
+    <div class="shop-topbar">
+      <button class="ghost-btn shop-back" onclick="hideMatch()">&#8249; Back</button>
+      <div class="wallet-badge"><span class="star-icon">&#9733;</span> <span id="matchWallet">0</span></div>
+    </div>
+    <h2>&#129380; Find the same amount!</h2>
+    <div id="matchTargetWrap">
+      <svg id="matchTarget" viewBox="0 0 160 160" width="96" height="96"></svg>
+      <div class="cmp-label" id="matchTargetLabel"></div>
+    </div>
+    <div id="matchOptions"></div>
+    <div id="matchMsg">Which one is the same?</div>
   </div>
 </div>
 
@@ -339,10 +374,10 @@
 <!-- generic reward toast (shared) -->
 <div id="achToast"></div>
 
-<script src="levels.js?v=10"></script>
-<script src="game.js?v=10"></script>
-<script src="shop.js?v=10"></script>
-<script src="extras.js?v=10"></script>
+<script src="levels.js?v=11"></script>
+<script src="game.js?v=11"></script>
+<script src="shop.js?v=11"></script>
+<script src="extras.js?v=11"></script>
 <script>
 if ('serviceWorker' in navigator) {
   var fp_refreshing = false;
@@ -350,7 +385,7 @@ if ('serviceWorker' in navigator) {
     if (fp_refreshing) return; fp_refreshing = true; location.reload();
   });
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=10').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=11').catch(function () {});
   });
 }
 </script>
